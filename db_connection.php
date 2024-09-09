@@ -7,11 +7,11 @@ $dbname = getenv('DB_NAME'); // اسم قاعدة البيانات
 $port = getenv('DB_PORT'); // المنفذ (إذا لزم الأمر)
 
 // إنشاء الاتصال بقاعدة البيانات
-$conn = new mysqli($host, $user, $password, $dbname, $port);
+$con = new mysqli($host, $user, $password, $dbname, $port);
 
 // التحقق من الاتصال
-if ($conn->connect_error) {
-    die("فشل الاتصال بقاعدة البيانات: " . $conn->connect_error);
+if ($con->connect_error) {
+    die("فشل الاتصال بقاعدة البيانات: " . $con->connect_error);
 }
 echo "تم الاتصال بقاعدة البيانات بنجاح";
 ?>
