@@ -9,6 +9,8 @@ $port = getenv('DB_PORT'); // المنفذ (إذا لزم الأمر)
 // إنشاء الاتصال بقاعدة البيانات
 $con = new mysqli($host, $user, $password, $dbname, $port);
 
+echo ($con->connect_error);
+
 // التحقق من الاتصال
 if ($con->connect_error) {
     die("فشل الاتصال بقاعدة البيانات: " . $con->connect_error);
