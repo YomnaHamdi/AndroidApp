@@ -4,10 +4,10 @@ require 'db_connection.php';
 
 $Company_name = $_POST['Company_name'];
 $Contact_person = $_POST['Contact_person'];
-$Location = $_POST['Location'];
-$Industry = $_POST['Industry'];
+$Location = $_POST['location'];
+$Industry = $_POST['industry'];
 
-$sql_insert = "INSERT INTO companies (Company_name, Contact_person, Location, Industry) 
+$sql_insert = "INSERT INTO companies (Company_name, Contact_person, location, industry) 
 VALUES ('$Company_name', '$Contact_person', '$Location', '$Industry')";
 
 if (mysqli_query($con, $sql_insert)) {
