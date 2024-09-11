@@ -1,7 +1,7 @@
 <?php
 require 'db_connection.php';
 
-$sql_select = "SELECT id, first_name, last_name, email, User_Education, User_Experience, User_Skills FROM users";
+$sql_select = "SELECT id, first_name, last_name, email, User_Education, User_Experience, User_Skillls FROM users";
 $result = mysqli_query($con, $sql_select);
 
 $users = [];
