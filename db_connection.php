@@ -15,5 +15,5 @@ echo ($con->connect_error);
 if ($con->connect_error) {
     die("فشل الاتصال بقاعدة البيانات: " . $con->connect_error);
 }
-echo "تم الاتصال بقاعدة البيانات بنجاح";
+//echo "تم الاتصال بقاعدة البيانات بنجاح";
 ?>
