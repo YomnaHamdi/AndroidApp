@@ -5,7 +5,7 @@ include_once 'db_connection.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (isset($data['certificate_id'])) {
-    $stmt = $con->prepare("DELETE FROM Certificate WHERE Certificate_id = ?");
+    $stmt = $con->prepare("DELETE FROM certificate WHERE certificate_id = ?");
     $stmt->bind_param("i", $data['certificate_id']);
     
     if ($stmt->execute()) {
