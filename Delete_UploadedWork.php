@@ -4,9 +4,9 @@ include_once 'db_connection.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['work_id'])) {
-    $stmt = $con->prepare("DELETE FROM uploadedwork WHERE Work_id = ?");
-    $stmt->bind_param("i", $data['work_id']);
+if (isset($data['Uploaded_id'])) {
+    $stmt = $con->prepare("DELETE FROM UploadedWork WHERE Uploaded_id = ?");
+    $stmt->bind_param("i", $data['Uploaded_id']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Work deleted successfully."));
