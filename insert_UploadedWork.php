@@ -4,9 +4,9 @@ include_once 'db_connection.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['user_id']) && isset($data['work_id']) && isset($data['title']) && isset($data['description']) && isset($data['file'])) {
-    $stmt = $con->prepare("INSERT INTO uploadedwork (User_id, Work_id, Title, Description, File, Uploaded_at) VALUES (?, ?, ?, ?, ?, NOW())");
-    $stmt->bind_param("iisss", $data['user_id'], $data['work_id'], $data['title'], $data['description'], $data['file']);
+if (isset($data['User_id']) && isset($data['Uploaded_id']) && isset($data['Title']) && isset($data['Description']) && isset($data['File'])) {
+    $stmt = $con->prepare("INSERT INTO UploadedWork (User_id, Uploaded_id, Title, Description, File, Uploaded_at) VALUES (?, ?, ?, ?, ?, NOW())");
+    $stmt->bind_param("iisss", $data['User_id'], $data['Uploaded_id'], $data['Title'], $data['Description'], $data['File']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Work uploaded successfully."));
