@@ -2,24 +2,24 @@
 require 'db_connection.php';
 
 
-if (isset($_POST['Company_id']) && isset($_POST['Company_name']) && isset($_POST['Contact_person']) &&
-    isset($_POST['Location']) && isset($_POST['Industry'])) {
+if (isset($_POST['company_id']) && isset($_POST['Company_name']) && isset($_POST['Contact_person']) &&
+    isset($_POST['location']) && isset($_POST['industry'])) {
 
   
-    $Company_id = intval($_POST['Company_id']);
+    $company_id = intval($_POST['company_id']);
     $Company_name = mysqli_real_escape_string($con, $_POST['Company_name']);
     $Contact_person = mysqli_real_escape_string($con, $_POST['Contact_person']);
-    $Location = mysqli_real_escape_string($con, $_POST['Location']);
-    $Industry = mysqli_real_escape_string($con, $_POST['Industry']);
+    $location = mysqli_real_escape_string($con, $_POST['location']);
+    $industry = mysqli_real_escape_string($con, $_POST['industry']);
 
   
-    if ($Company_id <= 0) {
+    if ($company_id <= 0) {
         echo json_encode(["status" => "error", "message" => "Invalid Company ID"]);
         exit();
     }
 
     
-    $sql_update = "UPDATE Companies SET Company_name='$Company_name', Contact_person='$Contact_person', Location='$Location', Industry='$Industry' WHERE Company_id=$Company_id";
+    $sql_update = "UPDATE Companies SET Company_name='$Company_name', Contact_person='$Contact_person', location='$location', industry='$industry' WHERE company_id=$company_id";
 
     if (mysqli_query($con, $sql_update)) {
         echo json_encode(["status" => "success", "message" => "Company updated successfully"]);
