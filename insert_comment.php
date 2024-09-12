@@ -4,9 +4,9 @@ include_once 'db_connection.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['Uploaded_id']) && isset($data['User_id']) && isset($data['Comment'])) {
-    $stmt = $con->prepare("INSERT INTO comments (Uploaded_id, User_id, Comment, Uploaded_at) VALUES (?, ?, ?, NOW())");
-    $stmt->bind_param("iis", $data['Uploaded_id'], $data['User_id'], $data['Comment']);
+if (isset($data['comment_id']) && isset($data['Uploaded_id']) && isset($data['User_id']) && isset($data['comment'])) {
+    $stmt = $con->prepare("INSERT INTO comments (Uploaded_id, User_id, comment, created_at) VALUES (?, ?, ?, NOW())");
+    $stmt->bind_param("iis",$data['comment_id'], $data['Uploaded_id'], $data['User_id'], $data['comment']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Comment added successfully."));
