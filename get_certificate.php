@@ -3,7 +3,7 @@
 include_once 'db_connection.php';
 
 if (isset($_GET['certificate_id'])) {
-    $stmt = $con->prepare("SELECT * FROM certificate WHERE Certificate_id = ?");
+    $stmt = $con->prepare("SELECT * FROM certificate WHERE certificate_id = ?");
     $stmt->bind_param("i", $_GET['certificate_id']);
     $stmt->execute();
     $result = $stmt->get_result();
