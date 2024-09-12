@@ -19,7 +19,7 @@ if (isset($_POST['company_id']) && isset($_POST['Company_name']) && isset($_POST
     }
 
     
-    $sql_update = "UPDATE Companies SET Company_name='$Company_name', Contact_person='$Contact_person', location='$location', industry='$industry' WHERE company_id=$company_id";
+    $sql_update = "UPDATE companies SET Company_name='$Company_name', Contact_person='$Contact_person', location='$location', industry='$industry' WHERE company_id=$company_id";
 
     if (mysqli_query($con, $sql_update)) {
         echo json_encode(["status" => "success", "message" => "Company updated successfully"]);
