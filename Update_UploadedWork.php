@@ -4,30 +4,30 @@ include_once 'db_connection.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['work_id'])) {
+if (isset($data['Uploaded_id'])) {
     $fields = array();
     $params = array();
     $types = '';
 
-    if (isset($data['title'])) {
+    if (isset($data['Title'])) {
         $fields[] = "Title = ?";
-        $params[] = $data['title'];
+        $params[] = $data['Title'];
         $types .= 's';
     }
-    if (isset($data['description'])) {
+    if (isset($data['Description'])) {
         $fields[] = "Description = ?";
-        $params[] = $data['description'];
+        $params[] = $data['Description'];
         $types .= 's';
     }
-    if (isset($data['file'])) {
+    if (isset($data['Fle'])) {
         $fields[] = "File = ?";
-        $params[] = $data['file'];
+        $params[] = $data['File'];
         $types .= 's';
     }
 
     if (count($fields) > 0) {
-        $query = "UPDATE UploadedWork SET " . implode(", ", $fields) . ", Uploaded_at = NOW() WHERE Work_id = ?";
-        $params[] = $data['work_id'];
+        $query = "UPDATE UploadedWork SET " . implode(", ", $fields) . ", Uploaded_at = NOW() WHERE Uploaded_id = ?";
+        $params[] = $data['Uploaded_id'];
         $types .= 'i';
 
         $stmt = $con->prepare($query);
