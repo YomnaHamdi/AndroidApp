@@ -16,7 +16,7 @@ if (isset($_POST['id'], $_POST['first_name'], $_POST['last_name'],$_POST['passwo
     
     if (is_numeric($id)) {
         
-        $sql_update = "UPDATE users SET first_name='$first_name', last_name='$last_name', email='$email',password='$password',
+        $sql_update = "UPDATE users SET id='$id',first_name='$first_name', last_name='$last_name', email='$email',password='$password',
         User_Education='$User_Education', User_Experience='$User_Experience', User_Skillls='$User_Skillls' WHERE id=$id";
         
         
