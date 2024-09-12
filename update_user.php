@@ -1,7 +1,7 @@
 <?php
 require 'db_connection.php';
 
-if (isset($_POST['id'], $_POST['first_name'], $_POST['last_name'],$_POST['password'], $_POST['email'], $_POST['User_Education'], $_POST['User_Experience'], $_POST['User_Skills'])) {
+if (isset($_POST['id'], $_POST['first_name'], $_POST['last_name'],$_POST['password'], $_POST['email'], $_POST['User_Education'], $_POST['User_Experience'], $_POST['User_Skillls'])) {
     
   
     $id = mysqli_real_escape_string($con, $_POST['id']);
@@ -11,13 +11,13 @@ if (isset($_POST['id'], $_POST['first_name'], $_POST['last_name'],$_POST['passwo
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $User_Education = mysqli_real_escape_string($con, $_POST['User_Education']);
     $User_Experience = mysqli_real_escape_string($con, $_POST['User_Experience']);
-    $User_Skills = mysqli_real_escape_string($con, $_POST['User_Skills']);
+    $User_Skillls = mysqli_real_escape_string($con, $_POST['User_Skillls']);
     
     
     if (is_numeric($id)) {
         
         $sql_update = "UPDATE users SET first_name='$first_name', last_name='$last_name', email='$email',password='$password',
-        User_Education='$User_Education', User_Experience='$User_Experience', User_Skills='$User_Skills' WHERE id=$id";
+        User_Education='$User_Education', User_Experience='$User_Experience', User_Skillls='$User_Skillls' WHERE id=$id";
         
         
         if (mysqli_query($con, $sql_update)) {
