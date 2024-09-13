@@ -2,9 +2,7 @@
 
 include_once 'db_connection.php';
 
-if (isset($_GET['job_id'])) {
-    $stmt = $con->prepare("SELECT * FROM job WHERE job_id = ?");
-    $stmt->bind_param("i", $_GET['job_id']);
+if (isset($_GET['GET['Job_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());
