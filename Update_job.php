@@ -11,44 +11,44 @@ if (isset($data['job_id'])) {
     $params = array();
     $types = '';
 
-    if (isset($data['job_title'])) {
+    if (isset($data['Job_title'])) {
         $fields[] = "Job_title = ?";
-        $params[] = $data['job_title'];
+        $params[] = $data['Jb_title'];
         $types .= 's';
     }
-    if (isset($data['company_id'])) {
+    if (isset($data['Company_id'])) {
         $fields[] = "Company_id = ?";
-        $params[] = $data['company_id'];
+        $params[] = $data['Company_id'];
         $types .= 'i';
     }
-    if (isset($data['job_description'])) {
+    if (isset($data['Job_description'])) {
         $fields[] = "Job_description = ?";
-        $params[] = $data['job_description'];
+        $params[] = $data['Job_description'];
         $types .= 's';
     }
-    if (isset($data['employment_type'])) {
+    if (isset($data['Employment_type'])) {
         $fields[] = "Employment_type = ?";
-        $params[] = $data['employment_type'];
+        $params[] = $data['Employment_type'];
         $types .= 's';
     }
-    if (isset($data['job_location'])) {
+    if (isset($data['Job_location'])) {
         $fields[] = "Job_location = ?";
-        $params[] = $data['job_location'];
+        $params[] = $data['Job_location'];
         $types .= 's';
     }
-    if (isset($data['salary_range'])) {
+    if (isset($data['Salary_range'])) {
         $fields[] = "Salary_range = ?";
-        $params[] = $data['salary_range'];
+        $params[] = $data['Salary_range'];
         $types .= 's';
     }
-    if (isset($data['requirements'])) {
+    if (isset($data['Requirements'])) {
         $fields[] = "Requirements = ?";
-        $params[] = $data['requirements'];
+        $params[] = $data['Requirements'];
         $types .= 's';
     }
-    if (isset($data['job_type'])) {
+    if (isset($data['Job_type'])) {
         $fields[] = "Job_type = ?";
-        $params[] = $data['job_type'];
+        $params[] = $data['Job_type'];
         $types .= 's';
     }
 
