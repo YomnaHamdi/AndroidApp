@@ -3,14 +3,14 @@
 include_once 'db_connection.php';
 
 if (isset($_GET['cv_id'])) {
-    $stmt = $con->prepare("SELECT * FROM cv WHERE CV_id = ?");
+    $stmt = $con->prepare("SELECT * FROM curriculum_vitae WHERE cV_id = ?");
     $stmt->bind_param("i", $_GET['cv_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());
-} else if (isset($_GET['user_id'])) {
-    $stmt = $con->prepare("SELECT * FROM cv WHERE User_id = ?");
-    $stmt->bind_param("i", $_GET['user_id']);
+} else if (isset($_GET['User_id'])) {
+    $stmt = $con->prepare("SELECT * FROM curriculum_vitae WHERE User_id = ?");
+    $stmt->bind_param("i", $_GET['User_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     $cvs = array();
