@@ -15,10 +15,10 @@ if (
     isset($data['Requirements']) &&
     isset($data['Job_type'])
 ) {
-    // تعديل الاستعلام ليحتوي على 9 متغيرات فقط بدون Posted_at
-    $stmt = $con->prepare("INSERT INTO jobs (Job_id, Company_id, Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Job_type, Posted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+    // تعديل الاستعلام ليشمل 9 أعمدة مع قيمة NOW() لـ Posted_at
+    $stmt = $con->prepare("INSERT INTO jobs (Job_id, Company_id, Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Job_type, Posted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
     
-    // تعديل bind_param لتربط 8 متغيرات فقط
+    // ربط 8 متغيرات فقط بدون Posted_at لأن NOW() سيملأ هذا الحقل تلقائيًا
     $stmt->bind_param("isssssss", $data['Job_id'], $data['Company_id'], $data['Job_title'], $data['Job_description'], $data['Employment_type'], $data['Job_location'], $data['Salary_range'], $data['Requirements'], $data['Job_type']);
     
     if ($stmt->execute()) {
