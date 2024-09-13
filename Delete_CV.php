@@ -5,7 +5,7 @@ include_once 'db_connection.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (isset($data['cv_id'])) {
-    $stmt = $con->prepare("DELETE FROM cv WHERE CV_id = ?");
+    $stmt = $con->prepare("DELETE FROM curriculum_vitae WHERE cv_id = ?");
     $stmt->bind_param("i", $data['cv_id']);
     
     if ($stmt->execute()) {
