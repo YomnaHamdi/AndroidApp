@@ -17,7 +17,7 @@ if (
     isset($data['Posted_at'])
 ) {
     $stmt = $con->prepare("INSERT INTO jobs (Job_id,Company_id, Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Job_type, Posted_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?, NOW())");
-    $stmt->bind_param("isssssss",$data['Job_id'],$data['Company_id'], $data['Job_title'], $data['Job_description'], $data['Employment_type'], $data['Job_location'], $data['Salary_range'], $data['Requirements'], $data['Job_type']);
+    $stmt->bind_param("isssssss",$data['Job_id'],$data['Company_id'], $data['Job_title'], $data['Job_description'], $data['Employment_type'], $data['Job_location'], $data['Salary_range'], $data['Requirements'], $data['Job_type'],$data['Posted_at']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Job created successfully."));
