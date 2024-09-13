@@ -10,7 +10,7 @@ $Bio = mysqli_real_escape_string($con, $_POST['Bio']);
 $User_image = mysqli_real_escape_string($con, $_POST['User_image']);
 
 
-$sql_check_user = "SELECT id FROM Users WHERE id='$User_id'";
+$sql_check_user = "SELECT id FROM users WHERE id='$User_id'";
 $result = mysqli_query($con, $sql_check_user);
 
 if (mysqli_num_rows($result) > 0) {
