@@ -2,15 +2,15 @@
 
 include_once 'db_connection.php';
 
-if (isset($_GET['notification_id'])) {
+if (isset($_GET['Notification_id'])) {
     $stmt = $con->prepare("SELECT * FROM job_notifications WHERE Notification_id = ?");
-    $stmt->bind_param("i", $_GET['notification_id']);
+    $stmt->bind_param("i", $_GET['Notification_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());
-} else if (isset($_GET['user_id'])) {
+} else if (isset($_GET['User_id'])) {
     $stmt = $con->prepare("SELECT * FROM job_notifications WHERE User_id = ?");
-    $stmt->bind_param("i", $_GET['user_id']);
+    $stmt->bind_param("i", $_GET['User_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     $notifications = array();
