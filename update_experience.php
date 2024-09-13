@@ -11,7 +11,7 @@ if (
     isset($data['end_date']) &&
     isset($data['description'])
 ) {
-    $stmt = $con->prepare("UPDATE Experience SET Company = ?, Start_Date = ?, End_Date = ?, Description = ? WHERE Experience_id = ?");
+    $stmt = $con->prepare("UPDATE Experience SET company = ?, start_date = ?, end_date = ?, description = ? WHERE experience_id = ?");
     $stmt->bind_param("ssssi", $data['company'], $data['start_date'], $data['end_date'], $data['description'], $data['experience_id']);
     
     if ($stmt->execute()) {
