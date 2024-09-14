@@ -13,7 +13,7 @@ if (isset($data['job_id'])) {
 
     if (isset($data['Job_title'])) {
         $fields[] = "Job_title = ?";
-        $params[] = $data['Jb_title'];
+        $params[] = $data['Job_title'];
         $types .= 's';
     }
     if (isset($data['Company_id'])) {
@@ -49,6 +49,17 @@ if (isset($data['job_id'])) {
     if (isset($data['Job_type'])) {
         $fields[] = "Job_type = ?";
         $params[] = $data['Job_type'];
+        $types .= 's';
+    }
+    
+    if (isset($data['star'])) {
+        $fields[] = "star = ?";
+        $params[] = $data['star'];
+        $types .= 'd'; // star هو رقم عشري (double)
+    }
+    if (isset($data['company_name'])) {
+        $fields[] = "company_name = ?";
+        $params[] = $data['company_name'];
         $types .= 's';
     }
 
