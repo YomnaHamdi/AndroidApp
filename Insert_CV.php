@@ -11,11 +11,10 @@ if (
     isset($data['Skills']) &&
     isset($data['WorkExperience']) &&
     isset($data['Education']) &&
-    isset($data['Created_at']) &&
     isset($data['Certifications'])
 ) {
-    $stmt = $con->prepare("INSERT INTO curriculum_vitae (cv_id,User_id, Created_at, Languages, Skills, WorkExperience, Education, Certifications) VALUES (?,?, NOW(), ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $data['cv_id'],$data['User_id'], $data['Languages'], $data['Skills'], $data['WorkExperience'], $data['Education'], $data['Certifications']);
+    $stmt = $con->prepare("INSERT INTO curriculum_vitae (cv_id, User_id, Created_at, Languages, Skills, WorkExperience, Education, Certifications) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssss", $data['cv_id'], $data['User_id'], $data['Languages'], $data['Skills'], $data['WorkExperience'], $data['Education'], $data['Certifications']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "CV uploaded successfully."));
