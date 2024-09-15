@@ -1,14 +1,14 @@
 <?php
 require 'db_connection.php';
 
-$company_id =$_POST['company_id'];
+
 $Company_name = $_POST['Company_name'];
 $Contact_person = $_POST['Contact_person'];
 $location = $_POST['location'];
 $industry = $_POST['industry'];
 
-$sql_insert = "INSERT INTO companies (company_id,Company_name, Contact_person, location, industry) 
-VALUES ('$company_id','$Company_name', '$Contact_person', '$location', '$industry')";
+$sql_insert = "INSERT INTO companies (Company_name, Contact_person, location, industry) 
+VALUE('$Company_name', '$Contact_person', '$location', '$industry')";
 
 if (mysqli_query($con, $sql_insert)) {
     echo json_encode(["status" => "success", "message" => "Company added successfully"]);
