@@ -2,7 +2,7 @@
 require 'db_connection.php';
 
 
-$User_id = mysqli_real_escape_string($con, $_POST['User_id']);
+
 $Gender = mysqli_real_escape_string($con, $_POST['Gender']);
 $Age = mysqli_real_escape_string($con, $_POST['Age']);
 $Location = mysqli_real_escape_string($con, $_POST['Location']);
@@ -18,8 +18,8 @@ $result = mysqli_query($con, $sql_check_user);
 
 if (mysqli_num_rows($result) > 0) {
     
-    $sql_insert = "INSERT INTO user_profile (User_id, Gender, Age, Location, Phone, Bio, User_image, user_name, email, job_name) 
-                   VALUES ('$User_id', '$Gender', '$Age', '$Location', '$Phone', '$Bio', '$User_image', '$user_name', '$email', '$job_name')";
+    $sql_insert = "INSERT INTO user_profile ( Gender, Age, Location, Phone, Bio, User_image, user_name, email, job_name) 
+                   VALUES ( '$Gender', '$Age', '$Location', '$Phone', '$Bio', '$User_image', '$user_name', '$email', '$job_name')";
     
     if (mysqli_query($con, $sql_insert)) {
         echo json_encode(["status" => "success", "message" => "User profile inserted successfully"]);
