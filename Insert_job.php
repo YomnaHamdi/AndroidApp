@@ -5,7 +5,7 @@ include_once 'db_connection.php';
 $data = json_decode(file_get_contents("php://input"), true);
 
 if (
-    isset($data['Job_id']) &&
+    
     isset($data['Company_id']) &&
     isset($data['Job_title']) &&
     isset($data['Job_description']) &&
@@ -18,10 +18,10 @@ if (
     isset($data['company_name']) 
 ) {
     
-    $stmt = $con->prepare("INSERT INTO jobs (Job_id, Company_id, Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Job_type, Posted_at, star, company_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)");
+    $stmt = $con->prepare("INSERT INTO jobs ( Company_id, Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Job_type, Posted_at, star, company_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)");
     
     
-    $stmt->bind_param("iisssssssis", $data['Job_id'], $data['Company_id'], $data['Job_title'], $data['Job_description'], $data['Employment_type'], $data['Job_location'], $data['Salary_range'], $data['Requirements'], $data['Job_type'], $data['star'], $data['company_name']);
+    $stmt->bind_param("isssssssis",  $data['Company_id'], $data['Job_title'], $data['Job_description'], $data['Employment_type'], $data['Job_location'], $data['Salary_range'], $data['Requirements'], $data['Job_type'], $data['star'], $data['company_name']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Job created successfully."));
