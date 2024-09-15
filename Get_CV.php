@@ -3,7 +3,7 @@
 include_once 'db_connection.php';
 
 if (isset($_GET['cv_id'])) {
-    $stmt = $con->prepare("SELECT * FROM curriculum_vitae WHERE cV_id = ?");
+    $stmt = $con->prepare("SELECT * FROM curriculum_vitae WHERE cv_id = ?");
     $stmt->bind_param("i", $_GET['cv_id']);
     $stmt->execute();
     $result = $stmt->get_result();
