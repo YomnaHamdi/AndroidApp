@@ -11,7 +11,7 @@ $User_Experience = "gggbvvd";
 $User_Skills = "njnjnjnj";
 
 
-if($first_name &&  $last_name && $email && $password && $User_Education && $User_Experience && $User_Education  ){
+if($first_name &&  $last_name && $email && $password && $User_Education && $User_Experience && $User_Skills  ){
 
     $user_login = mysqli_query($con, "SELECT * FROM `users` WHERE `email` = '$email' ;");
 
