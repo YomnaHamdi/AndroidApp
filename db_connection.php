@@ -1,17 +1,27 @@
 <?php
-// قراءة متغيرات البيئة من Railway
-$host = getenv('DB_HOST'); // مضيف قاعدة البيانات
-$user = getenv('DB_USER'); // اسم المستخدم
-$password = getenv('DB_PASS'); // كلمة المرور
-$dbname = getenv('DB_NAME'); // اسم قاعدة البيانات
-$port = getenv('DB_PORT'); // المنفذ (إذا لزم الأمر)
+// إعدادات CORS
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+// التعامل مع طلبات OPTIONS
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    header("Access-Control-Allow-Origin: *");
+    header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+    header("Access-Control-Allow-Headers: Content-Type, Authorization");
+    exit(0);
+}
+
+$host = getenv('DB_HOST'); 
+$user = getenv('DB_USER'); 
+$password = getenv('DB_PASS'); 
+$dbname = getenv('DB_NAME'); 
+$port = getenv('DB_PORT'); 
 
 // إنشاء الاتصال بقاعدة البيانات
 $con = new mysqli($host, $user, $password, $dbname, $port);
 
-echo ($con->connect_error);
 
-// التحقق من الاتصال
 if ($con->connect_error) {
     die("فشل الاتصال بقاعدة البيانات: " . $con->connect_error);
 }
