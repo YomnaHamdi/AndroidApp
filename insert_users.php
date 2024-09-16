@@ -10,7 +10,7 @@ $User_Skillls = $_POST['User_Skills'];
 
 
 $stmt = $con->prepare("INSERT INTO users (User_name, email, password, User_Education, User_Experience, User_Skills) VALUES ( ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssssss", $User_name, $email, $password, $User_Education, $User_Experience, $User_Skillls);
+$stmt->bind_param("ssssss", $User_name, $email, $password, $User_Education, $User_Experience, $User_Skills);
 
 
 if ($stmt->execute()) {
