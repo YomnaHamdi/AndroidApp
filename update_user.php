@@ -10,13 +10,13 @@ if (isset($_POST['id'], $_POST['User_name'],$_POST['password'], $_POST['email'],
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $User_Education = mysqli_real_escape_string($con, $_POST['User_Education']);
     $User_Experience = mysqli_real_escape_string($con, $_POST['User_Experience']);
-    $User_Skillls = mysqli_real_escape_string($con, $_POST['User_Skillls']);
+    $User_Skillls = mysqli_real_escape_string($con, $_POST['User_Skills']);
     
     
     if (is_numeric($id)) {
         
         $sql_update = "UPDATE users SET id='$id',User_name='$User_name',  email='$email',password='$password',
-        User_Education='$User_Education', User_Experience='$User_Experience', User_Skillls='$User_Skillls' WHERE id=$id";
+        User_Education='$User_Education', User_Experience='$User_Experience', User_Skills='$User_Skills' WHERE id=$id";
         
         
         if (mysqli_query($con, $sql_update)) {
