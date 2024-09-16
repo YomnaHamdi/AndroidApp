@@ -6,10 +6,10 @@ $email = $_POST['email'];
 $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 $User_Education = $_POST['User_Education'];
 $User_Experience = $_POST['User_Experience'];
-$User_Skillls = $_POST['User_Skillls'];
+$User_Skillls = $_POST['User_Skills'];
 
 
-$stmt = $con->prepare("INSERT INTO users (User_name, email, password, User_Education, User_Experience, User_Skillls) VALUES ( ?, ?, ?, ?, ?, ?)");
+$stmt = $con->prepare("INSERT INTO users (User_name, email, password, User_Education, User_Experience, User_Skills) VALUES ( ?, ?, ?, ?, ?, ?)");
 $stmt->bind_param("ssssss", $User_name, $email, $password, $User_Education, $User_Experience, $User_Skillls);
 
 
