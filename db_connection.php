@@ -12,11 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     exit(0);
 }
 
-$host = getenv('DB_HOST'); 
-$user = getenv('DB_USER'); 
-$password = getenv('DB_PASS'); 
-$dbname = getenv('DB_NAME'); 
-$port = getenv('DB_PORT'); 
+$host = getenv('mysql-ljoe.railway.internal'); 
+$user = getenv('root'); 
+$password = getenv('atEyfVtHHNqqTgGWqhgYbYhZrzjBPMbt'); 
+$dbname = getenv('railway'); 
+$port = getenv('3306'); 
 
 // إنشاء الاتصال بقاعدة البيانات
 $con = new mysqli($host, $user, $password, $dbname, $port);
