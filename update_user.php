@@ -4,7 +4,7 @@ require 'db_connection.php';
 if (isset($_POST['id'], $_POST['User_name'],$_POST['password'], $_POST['email'], $_POST['User_Education'], $_POST['User_Experience'], $_POST['User_Skillls'])) {
     
   
-    $id = mysqli_real_escape_string($con, $_POST['id']);
+    $id = mysqli_real_escape_string($con, $_POST['User_id']);
     $User_name = mysqli_real_escape_string($con, $_POST['User_name']);
     $password = mysqli_real_escape_string($con, $_POST['password']);
     $email = mysqli_real_escape_string($con, $_POST['email']);
@@ -15,8 +15,8 @@ if (isset($_POST['id'], $_POST['User_name'],$_POST['password'], $_POST['email'],
     
     if (is_numeric($id)) {
         
-        $sql_update = "UPDATE users SET id='$id',User_name='$User_name',  email='$email',password='$password',
-        User_Education='$User_Education', User_Experience='$User_Experience', User_Skills='$User_Skills' WHERE id=$id";
+        $sql_update = "UPDATE users SET User_id='$User_id',User_name='$User_name',  email='$email',password='$password',
+        User_Education='$User_Education', User_Experience='$User_Experience', User_Skills='$User_Skills' WHERE User_id=$User_id";
         
         
         if (mysqli_query($con, $sql_update)) {
