@@ -57,6 +57,12 @@ if (isset($data['job_id'])) {
         $params[] = $data['star'];
         $types .= 'd'; // star هو رقم عشري (double)
     }
+    if (isset($data['Date'])) {
+        $fields[] = "Date = ?";
+        $params[] = $data['Date'];
+        $types .= 's';
+    }
+
     if (isset($data['company_name'])) {
         $fields[] = "company_name = ?";
         $params[] = $data['company_name'];
