@@ -62,7 +62,11 @@ if (isset($data['job_id'])) {
         $params[] = $data['Date'];
         $types .= 's';
     }
-
+    if (isset($data['job_mode'])) {
+        $fields[] = "job_mode = ?";
+        $params[] = $data['job_mode'];
+        $types .= 's';
+    }
     if (isset($data['company_name'])) {
         $fields[] = "company_name = ?";
         $params[] = $data['company_name'];
