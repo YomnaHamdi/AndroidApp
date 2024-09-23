@@ -2,11 +2,11 @@
 
 include_once 'db_connection.php';
 
-if (isset($_GET['Comment_id'])) {
-    $comment_id = intval($_GET['Comment_id']);
+if (isset($_GET['comment_id'])) {
+    $comment_id = intval($_GET['comment_id']);
     
     if ($comment_id > 0) {
-        $stmt = $con->prepare("DELETE FROM comments WHERE Comment_id = ?");
+        $stmt = $con->prepare("DELETE FROM comments WHERE comment_id = ?");
         $stmt->bind_param("i", $comment_id);
         
         if ($stmt->execute()) {

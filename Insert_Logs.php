@@ -4,9 +4,9 @@ include_once 'db_connection.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['user_id']) && isset($data['action'])) {
+if (isset($data['User_id']) && isset($data['Action'])) {
     $stmt = $con->prepare("INSERT INTO logs (User_id, Timestamp, Action) VALUES (?, NOW(), ?)");
-    $stmt->bind_param("is", $data['user_id'], $data['action']);
+    $stmt->bind_param("is", $data['User_id'], $data['Action']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Log added successfully."));

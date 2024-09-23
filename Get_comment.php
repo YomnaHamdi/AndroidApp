@@ -2,9 +2,9 @@
 
 include_once 'db_connection.php';
 
-if (isset($_GET['Comment_id'])) {
-    $stmt = $con->prepare("SELECT * FROM comments WHERE Comment_id = ?");
-    $stmt->bind_param("i", $_GET['Comment_id']);
+if (isset($_GET['comment_id'])) {
+    $stmt = $con->prepare("SELECT * FROM comments WHERE comment_id = ?");
+    $stmt->bind_param("i", $_GET['comment_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());

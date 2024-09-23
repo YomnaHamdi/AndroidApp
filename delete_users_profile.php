@@ -8,7 +8,7 @@ parse_str(file_get_contents("php://input"), $data);
 $User_id = mysqli_real_escape_string($con, $data['User_id']);
 
 if (is_numeric($User_id)) {
-    $sql_delete = "DELETE FROM User_Profile WHERE User_id=$User_id";
+    $sql_delete = "DELETE FROM user_profile WHERE User_id=$User_id";
 
     if (mysqli_query($con, $sql_delete)) {
         echo json_encode(["status" => "success", "message" => "User profile deleted successfully"]);

@@ -1,27 +1,42 @@
 <?php
 
-include "db_connection.php";
+include_once 'db_connection.php'; 
 
-$email = "yomna@gmail.com";
-$pass = "";
+$data = json_decode(file_get_contents("php://input"), true);
 
-if($email && $pass){
+if (isset($data['email']) && isset($data['password'])) {
+    $email = $data['email'];
+    $password = $data['password'];
 
-    $user_login = mysqli_query($con, "SELECT * FROM `users` WHERE `email` = '$email' AND `password` = '$pass';");
+    
+    $stmt = $con->prepare("SELECT id, password FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
 
-    if (mysqli_num_rows($user_login) > 0){
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result($id, $hashedPassword);
+        $stmt->fetch();
 
-        $user = mysqli_fetch_object($user_login);
-
-        echo json_encode($user);
-
-    }else{
-        echo json_encode("not_found");
+        
+        if (password_verify($password, $hashedPassword)) {
+            
+            echo json_encode(array(
+                "message" => "Login successful",
+                "user_id" => $id
+            ));
+        } else {
+            
+            echo json_encode(array("message" => "Invalid password"));
+        }
+    } else {
+        
+        echo json_encode(array("message" => "User not found"));
     }
-
-}else{
-    echo json_encode("error");
+} else {
+    echo json_encode(array("message" => "Invalid input"));
 }
 
+mysqli_close($con);
 
 ?>

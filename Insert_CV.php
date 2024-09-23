@@ -6,19 +6,29 @@ $data = json_decode(file_get_contents("php://input"), true);
 
 if (
     isset($data['User_id']) &&
+    isset($data['User_name']) &&
+    isset($data['Phone']) &&
     isset($data['Languages']) &&
-    isset($data['Skills']) &&
-    isset($data['WorkExperience']) &&
-    isset($data['Education']) &&
-    isset($data['Certifications'])
+    isset($data['Education']) 
 ) {
-    $stmt = $con->prepare("INSERT INTO cv (User_id, Created_at, Languages, Skills, WorkExperience, Education, Certifications) VALUES (?, NOW(), ?, ?, ?, ?, ?)");
-    $stmt->bind_param("isssss", $data['User_id'], $data['Languages'], $data['Skills'], $data['WorkExperience'], $data['Education'], $data['Certifications']);
     
-    if ($stmt->execute()) {
-        echo json_encode(array("message" => "CV uploaded successfully."));
+    $stmt_check = $con->prepare("SELECT * FROM curriculum_vitae WHERE User_id = ?");
+    $stmt_check->bind_param("s", $data['User_id']);
+    $stmt_check->execute();
+    $result = $stmt_check->get_result();
+
+    if ($result->num_rows > 0) {
+        echo json_encode(array("message" => "CV already exists for this user."));
     } else {
-        echo json_encode(array("message" => "Error: " . $stmt->error));
+        // إذا لم يكن لدى المستخدم سيرة ذاتية، قم بإدخال البيانات
+        $stmt = $con->prepare("INSERT INTO curriculum_vitae (User_id, User_name, Phone, Created_at, Languages, Education) VALUES (?, ?, ?, NOW(), ?, ?)");
+        $stmt->bind_param("sssss", $data['User_id'], $data['User_name'], $data['Phone'], $data['Languages'], $data['Education']);
+        
+        if ($stmt->execute()) {
+            echo json_encode(array("message" => "CV uploaded successfully."));
+        } else {
+            echo json_encode(array("message" => "Error: " . $stmt->error));
+        }
     }
 } else {
     echo json_encode(array("message" => "Invalid input"));

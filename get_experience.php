@@ -3,13 +3,13 @@
 include_once 'db_connection.php';
 
 if (isset($_GET['experience_id'])) {
-    $stmt = $con->prepare("SELECT * FROM experience WHERE Experience_id = ?");
+    $stmt = $con->prepare("SELECT * FROM experience WHERE experience_id = ?");
     $stmt->bind_param("i", $_GET['experience_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());
 } else if (isset($_GET['company'])) {
-    $stmt = $con->prepare("SELECT * FROM experience WHERE Company = ?");
+    $stmt = $con->prepare("SELECT * FROM experience WHERE company = ?");
     $stmt->bind_param("s", $_GET['company']);
     $stmt->execute();
     $result = $stmt->get_result();

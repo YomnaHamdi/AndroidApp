@@ -2,9 +2,9 @@
 
 include_once 'db_connection.php';
 
-if (isset($_GET['application_id'])) {
+if (isset($_GET['Application_id'])) {
     $stmt = $con->prepare("SELECT * FROM job_application WHERE Application_id = ?");
-    $stmt->bind_param("i", $_GET['application_id']);
+    $stmt->bind_param("i", $_GET['Application_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());

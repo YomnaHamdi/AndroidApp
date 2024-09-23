@@ -4,9 +4,9 @@ include_once 'db_connection.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if (isset($data['application_id']) && isset($data['status'])) {
+if (isset($data['Application_id']) && isset($data['Status'])) {
     $stmt = $con->prepare("UPDATE job_application SET Status = ? WHERE Application_id = ?");
-    $stmt->bind_param("si", $data['status'], $data['application_id']);
+    $stmt->bind_param("si", $data['Status'], $data['Application_id']);
     
     if ($stmt->execute()) {
         echo json_encode(array("message" => "Job application updated successfully."));

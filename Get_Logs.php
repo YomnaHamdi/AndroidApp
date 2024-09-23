@@ -2,13 +2,13 @@
 
 include_once 'db_connection.php';
 
-if (isset($_GET['log_id'])) {
+if (isset($_GET['Log_id'])) {
     $stmt = $con->prepare("SELECT * FROM logs WHERE Log_id = ?");
-    $stmt->bind_param("i", $_GET['log_id']);
+    $stmt->bind_param("i", $_GET['Log_id']);
     $stmt->execute();
     $result = $stmt->get_result();
     echo json_encode($result->fetch_assoc());
-} else if (isset($_GET['user_id'])) {
+} else if (isset($_GET['User_id'])) {
     $stmt = $con->prepare("SELECT * FROM logs WHERE User_id = ?");
     $stmt->bind_param("i", $_GET['user_id']);
     $stmt->execute();
