@@ -1,7 +1,7 @@
 <?php
 
 include_once 'db_connection.php'; 
-require 'vendor/autoload.php'; // تأكد من تضمين autoload لمكتبة JWT
+require 'vendor/autoload.php'; 
 use \Firebase\JWT\JWT;
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -22,7 +22,7 @@ if (isset($data['email']) && isset($data['password'])) {
         
         if (password_verify($password, $hashedPassword)) {
             // إعداد التوكن
-            $secret_key = ""; 
+            $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
             $expiration_time = time() + (60 * 60); // مدة صلاحية التوكن (ساعة)
             $token = array(
                 "iat" => time(), // تاريخ الإنشاء
