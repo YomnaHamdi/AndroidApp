@@ -3,7 +3,7 @@
 include_once 'db_connection.php'; 
 require 'vendor/autoload.php'; 
 use \Firebase\JWT\JWT;
-use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 require 'auth.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true);
