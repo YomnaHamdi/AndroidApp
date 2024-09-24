@@ -1,27 +1,26 @@
 <?php
 
-include_once 'db_connection.php';
+include_once 'db_connection.php'; 
 require 'vendor/autoload.php'; 
 use \Firebase\JWT\JWT;
-require 'auth.php';
+require 'auth.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-//  (Authorization)
+// احصل على التوكن من الهيدر (Authorization)
 $jwt = isset($_SERVER['HTTP_AUTHORIZATION']) ? str_replace('Bearer ', '', $_SERVER['HTTP_AUTHORIZATION']) : null;
 
 if ($jwt) {
     try {
         $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
-        $decoded = JWT::decode($jwt, new \Firebase\JWT\Key($secret_key, 'HS256'));
-        $User_id = $decoded->data->User_id; // استخدم الـ user_id من التوكن
+        $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+        $User_id = $decoded->data->User_id; // احصل على User_id من التوكن
 
-        
         if (
             isset($data['User_name']) &&
             isset($data['Phone']) &&
             isset($data['Languages']) &&
-            isset($data['Education'])
+            isset($data['Education']) 
         ) {
             
             $stmt_check = $con->prepare("SELECT * FROM curriculum_vitae WHERE User_id = ?");
@@ -34,7 +33,7 @@ if ($jwt) {
             } else {
                 
                 $stmt = $con->prepare("INSERT INTO curriculum_vitae (User_id, User_name, Phone, Created_at, Languages, Education) VALUES (?, ?, ?, NOW(), ?, ?)");
-                $stmt->bind_param("sssss", $user_id, $data['User_name'], $data['Phone'], $data['Languages'], $data['Education']);
+                $stmt->bind_param("sssss", $User_id, $data['User_name'], $data['Phone'], $data['Languages'], $data['Education']);
                 
                 if ($stmt->execute()) {
                     echo json_encode(array("message" => "CV uploaded successfully."));
@@ -46,10 +45,17 @@ if ($jwt) {
             echo json_encode(array("message" => "Invalid input"));
         }
     } catch (Exception $e) {
-        echo json_encode(array("message" => "Access denied.", "error" => $e->getMessage()));
+        echo json_encode(array(
+            "message" => "Access denied.",
+            "error" => $e->getMessage()
+        ));
+        exit();
     }
 } else {
-    echo json_encode(array("message" => "JWT not provided."));
+    echo json_encode(array(
+        "message" => "JWT not provided."
+    ));
+    exit();
 }
 
 mysqli_close($con);
