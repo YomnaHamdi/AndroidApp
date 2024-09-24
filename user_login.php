@@ -16,7 +16,7 @@ if (isset($data['email']) && isset($data['password'])) {
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        $stmt->bind_result($id, $hashedPassword);
+        $stmt->bind_result($User_id, $hashedPassword);
         $stmt->fetch();
 
         if (password_verify($password, $hashedPassword)) {
@@ -27,7 +27,7 @@ if (isset($data['email']) && isset($data['password'])) {
                 "iat" => time(), // تاريخ الإنشاء
                 "exp" => $expiration_time, // تاريخ الانتهاء
                 "data" => array(
-                    "user_id" => $id // 
+                    "User_id" => $User_id // 
                 )
             );
 
