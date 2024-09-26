@@ -24,7 +24,7 @@ if (isset($data['email']) && isset($data['password'])) {
         
         if (password_verify($password, $hashedPassword)) {
         
-            $JWT_SECRET_KEY = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
+            $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
             $expiration_time = time() + (60 * 60); // مدة صلاحية التوكن (ساعة)
             $token = array(
                 "iat" => time(), // تاريخ الإنشاء
