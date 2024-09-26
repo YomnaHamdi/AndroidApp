@@ -2,7 +2,7 @@
 require 'db_connection.php';
 
 
-
+$User_id = mysqli_real_escape_string($con, $_POST['User_id']);
 $Gender = mysqli_real_escape_string($con, $_POST['Gender']);
 $Age = mysqli_real_escape_string($con, $_POST['Age']);
 $Location = mysqli_real_escape_string($con, $_POST['Location']);
@@ -13,13 +13,14 @@ $user_name = mysqli_real_escape_string($con, $_POST['user_name']);
 $email = mysqli_real_escape_string($con, $_POST['email']);
 $job_name = mysqli_real_escape_string($con, $_POST['job_name']);
 
+
 $sql_check_user = "SELECT User_id FROM users WHERE User_id='$User_id'";
 $result = mysqli_query($con, $sql_check_user);
 
 if (mysqli_num_rows($result) > 0) {
     
-    $sql_insert = "INSERT INTO user_profile ( Gender, Age, Location, Phone, Bio, User_image, user_name, email, job_name) 
-                   VALUES ( '$Gender', '$Age', '$Location', '$Phone', '$Bio', '$User_image', '$user_name', '$email', '$job_name')";
+    $sql_insert = "INSERT INTO user_profile (User_id, Gender, Age, Location, Phone, Bio, User_image, user_name, email, job_name) 
+                   VALUES ('$User_id', '$Gender', '$Age', '$Location', '$Phone', '$Bio', '$User_image', '$user_name', '$email', '$job_name')";
     
     if (mysqli_query($con, $sql_insert)) {
         echo json_encode(["status" => "success", "message" => "User profile inserted successfully"]);
@@ -29,6 +30,7 @@ if (mysqli_num_rows($result) > 0) {
 } else {
     echo json_encode(["status" => "error", "message" => "Error: User ID does not exist in Users table"]);
 }
+
 
 mysqli_close($con);
 ?>
