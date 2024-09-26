@@ -13,7 +13,7 @@ $user_name = mysqli_real_escape_string($con, $_POST['user_name']);
 $email = mysqli_real_escape_string($con, $_POST['email']);
 $job_name = mysqli_real_escape_string($con, $_POST['job_name']);
 
-$sql_check_user = "SELECT id FROM users WHERE id='$User_id'";
+$sql_check_user = "SELECT User_id FROM users WHERE User_id='$User_id'";
 $result = mysqli_query($con, $sql_check_user);
 
 if (mysqli_num_rows($result) > 0) {
