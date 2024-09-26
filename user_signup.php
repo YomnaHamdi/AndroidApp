@@ -1,6 +1,8 @@
 <?php
 
 include_once 'db_connection.php'; 
+require 'vendor/autoload.php'; 
+use \Firebase\JWT\JWT;
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -9,17 +11,17 @@ if (
     isset($data['password']) &&
     isset($data['confirm_password'])
 ) {
-    $email = $data['email'];
+    $email = mysqli_real_escape_string($con, $data['email']);
     $password = $data['password'];
     $confirmPassword = $data['confirm_password'];
 
-    // التحقق من مطابقة كلمة المرور
+    
     if ($password !== $confirmPassword) {
         echo json_encode(array("message" => "Passwords do not match"));
         exit();
     }
 
-    // التحقق من وجود المستخدم مسبقاً
+    
     $stmt = $con->prepare("SELECT User_id FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -30,15 +32,34 @@ if (
         exit();
     }
 
-    // تشفير كلمة المرور
+
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    
+
     $stmt = $con->prepare("INSERT INTO users (email, password, created_at) VALUES (?, ?, NOW())");
     $stmt->bind_param("ss", $email, $hashedPassword);
 
     if ($stmt->execute()) {
-        echo json_encode(array("message" => "User registered successfully"));
+        
+        $User_id = $stmt->insert_id; 
+        $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
+        $expiration_time = time() + (60 * 60); 
+        $token = array(
+            "iat" => time(), 
+            "exp" => $expiration_time, 
+            "data" => array(
+                "User_id" => $User_id 
+            )
+        );
+
+        
+        $jwt = JWT::encode($token, $secret_key, 'HS256');
+
+        
+        echo json_encode(array(
+            "message" => "User registered successfully",
+            "jwt" => $jwt 
+        ));
     } else {
         echo json_encode(array("message" => "Error: " . $stmt->error));
     }
