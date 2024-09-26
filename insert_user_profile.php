@@ -12,7 +12,7 @@ if (isset($headers['Authorization'])) {
     $jwt = str_replace('Bearer ', '', $authHeader);
 
     try {
-    
+        $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5";
         $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
         $User_id = $decoded->User_id; 
 
