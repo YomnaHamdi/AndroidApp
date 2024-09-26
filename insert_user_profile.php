@@ -1,8 +1,6 @@
 <?php
 require 'db_connection.php';
-require 'auth.php';  
-require 'vendor/autoload.php'; // تحميل مكتبة JWT
-
+require 'vendor/autoload.php'; 
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 
@@ -12,11 +10,11 @@ if (isset($headers['Authorization'])) {
     $jwt = str_replace('Bearer ', '', $authHeader);
 
     try {
-        $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5";
+        $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
         $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-        $User_id = $decoded->User_id; 
+        $User_id = $decoded->data->User_id; 
 
-        
+    
         $Gender = mysqli_real_escape_string($con, $_POST['Gender']);
         $Age = mysqli_real_escape_string($con, $_POST['Age']);
         $Location = mysqli_real_escape_string($con, $_POST['Location']);
@@ -32,7 +30,6 @@ if (isset($headers['Authorization'])) {
         $result = mysqli_query($con, $sql_check_user);
 
         if (mysqli_num_rows($result) > 0) {
-            
             $sql_insert = "INSERT INTO user_profile (User_id, Gender, Age, Location, Phone, Bio, User_image, user_name, email, job_name) 
                            VALUES ('$User_id', '$Gender', '$Age', '$Location', '$Phone', '$Bio', '$User_image', '$user_name', '$email', '$job_name')";
 
@@ -46,12 +43,10 @@ if (isset($headers['Authorization'])) {
         }
 
     } catch (Exception $e) {
-        
-        echo json_encode(["status" => "error", "message" => "Invalid token"]);
+        echo json_encode(["status" => "error", "message" => "Invalid token: " . $e->getMessage()]);
     }
 
 } else {
-    
     echo json_encode(["status" => "error", "message" => "Authorization header not found"]);
 }
 
