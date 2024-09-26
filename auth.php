@@ -1,6 +1,7 @@
 <?php
 
 require 'db_connection.php'; 
+require 'vendor/autoload.php';
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 
