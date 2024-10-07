@@ -32,7 +32,6 @@ if (
         exit();
     }
 
-
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
 
@@ -40,13 +39,12 @@ if (
     $stmt->bind_param("ss", $email, $hashedPassword);
 
     if ($stmt->execute()) {
-        
         $User_id = $stmt->insert_id; 
         $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
         $expiration_time = time() + (60 * 60); 
         $token = array(
-            "iat" => time(), 
-            "exp" => $expiration_time, 
+            "iat" => time(),
+            "exp" => $expiration_time,
             "data" => array(
                 "User_id" => $User_id 
             )
@@ -56,9 +54,17 @@ if (
         $jwt = JWT::encode($token, $secret_key, 'HS256');
 
         
+        $decodedToken = JWT::decode($jwt, $secret_key, array('HS256'));
+        $userId = $decodedToken->data->User_id;
+
+        
+        $link = "https://androidapp-production.up.railway.app/token?key=$userId";
+
+    
         echo json_encode(array(
             "message" => "User registered successfully",
-            "jwt" => $jwt 
+            "jwt" => $jwt, 
+            "link" => $link 
         ));
     } else {
         echo json_encode(array("message" => "Error: " . $stmt->error));
@@ -68,5 +74,4 @@ if (
 }
 
 mysqli_close($con);
-
 ?>
