@@ -21,7 +21,7 @@ if (isset($data['email']) && isset($data['password'])) {
 
         if (password_verify($password, $hashedPassword)) {
             $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
-            $expiration_time = time() + (60 * 60); // مدة صلاحية التوكن (ساعة)
+            $expiration_time = time() + (60 * 60); 
             $token = array(
                 "iat" => time(),
                 "exp" => $expiration_time,
@@ -32,9 +32,18 @@ if (isset($data['email']) && isset($data['password'])) {
 
             $jwt = JWT::encode($token, $secret_key, 'HS256');
 
+            
+            $decodedToken = JWT::decode($jwt, $secret_key, array('HS256'));
+            $userId = $decodedToken->data->User_id;
+
+            
+            $link = "https://androidapp-production.up.railway.app/token?key=$userId";
+
+        
             echo json_encode(array(
                 "message" => "Login successful",
-                "jwt" => $jwt // إرجاع التوكن للمستخدم
+                "jwt" => $jwt, // إرجاع التوكن للمستخدم
+                "link" => $link // إرجاع الرابط الذي يحتوي على User ID
             ));
         } else {
             echo json_encode(array("message" => "Invalid password"));
