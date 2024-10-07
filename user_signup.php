@@ -15,7 +15,7 @@ if (
     $password = $data['password'];
     $confirmPassword = $data['confirm_password'];
 
-    
+    // تحقق من تطابق كلمة المرور
     if ($password !== $confirmPassword) {
         echo json_encode(array("message" => "Passwords do not match"));
         exit();
@@ -32,9 +32,10 @@ if (
         exit();
     }
 
+    
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-
+    
     $stmt = $con->prepare("INSERT INTO users (email, password, created_at) VALUES (?, ?, NOW())");
     $stmt->bind_param("ss", $email, $hashedPassword);
 
@@ -54,18 +55,22 @@ if (
         $jwt = JWT::encode($token, $secret_key, 'HS256');
 
         
-        $decodedToken = JWT::decode($jwt, $secret_key, array('HS256'));
-        $userId = $decodedToken->data->User_id;
+        try {
+            $decodedToken = JWT::decode($jwt, new \Firebase\JWT\Key($secret_key, 'HS256'));
+            $userId = $decodedToken->data->User_id;
 
-        
-        $link = "https://androidapp-production.up.railway.app/token?key=$userId";
+            
+            $link = "https://androidapp-production.up.railway.app/token?key=$userId";
 
-    
-        echo json_encode(array(
-            "message" => "User registered successfully",
-            "jwt" => $jwt, 
-            "link" => $link 
-        ));
+            
+            echo json_encode(array(
+                "message" => "User registered successfully",
+                "jwt" => $jwt, 
+                "link" => $link 
+            ));
+        } catch (Exception $e) {
+            echo json_encode(array("message" => "Error decoding JWT: " . $e->getMessage()));
+        }
     } else {
         echo json_encode(array("message" => "Error: " . $stmt->error));
     }
