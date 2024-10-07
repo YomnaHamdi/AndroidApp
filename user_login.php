@@ -3,6 +3,7 @@
 include_once 'db_connection.php'; 
 require 'vendor/autoload.php'; 
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -30,21 +31,23 @@ if (isset($data['email']) && isset($data['password'])) {
                 )
             );
 
+            
             $jwt = JWT::encode($token, $secret_key, 'HS256');
 
             
-            $decodedToken = JWT::decode($jwt, $secret_key, array('HS256'));
-            $userId = $decodedToken->data->User_id;
+            try {
+                $decodedToken = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+                $userId = $decodedToken->data->User_id;
 
-            
-            $link = "https://androidapp-production.up.railway.app/token?key=$userId";
-
-        
-            echo json_encode(array(
-                "message" => "Login successful",
-                "jwt" => $jwt, // إرجاع التوكن للمستخدم
-                "link" => $link // إرجاع الرابط الذي يحتوي على User ID
-            ));
+                
+                echo json_encode(array(
+                    "message" => "Login successful",
+                    "jwt" => $jwt,
+                    "userId" => $userId
+                ));
+            } catch (Exception $e) {
+                echo json_encode(array("message" => "Error decoding JWT: " . $e->getMessage()));
+            }
         } else {
             echo json_encode(array("message" => "Invalid password"));
         }
