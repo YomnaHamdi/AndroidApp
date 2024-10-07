@@ -4,7 +4,6 @@ include_once 'db_connection.php';
 require 'vendor/autoload.php'; 
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
-require 'auth.php'; 
 
 $data = json_decode(file_get_contents("php://input"), true);
 
@@ -50,15 +49,12 @@ if ($jwt) {
             "message" => "Access denied.",
             "error" => $e->getMessage()
         ));
-        exit();
     }
 } else {
     echo json_encode(array(
         "message" => "JWT not provided."
     ));
-    exit();
 }
 
 mysqli_close($con);
-
 ?>
