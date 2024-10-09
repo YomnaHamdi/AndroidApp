@@ -17,7 +17,7 @@ if (isset($headers['Authorization'])) {
         try {
             
             $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-            $user_id = $decoded->User_id;
+            $user_id = $decoded->data->User_id;
 
             
             $query = "SELECT * FROM users WHERE User_id = ?";
