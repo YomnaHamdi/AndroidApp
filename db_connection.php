@@ -19,11 +19,11 @@ $dbname = getenv('DB_NAME');
 $port = getenv('DB_PORT'); 
 
 // إنشاء الاتصال بقاعدة البيانات
-$con = new mysqli($host, $user, $password, $dbname, $port);
+$conn = new mysqli($host, $user, $password, $dbname, $port);
 
 
-if ($con->connect_error) {
-    die("فشل الاتصال بقاعدة البيانات: " . $con->connect_error);
+if ($conn->connect_error) {
+    die("فشل الاتصال بقاعدة البيانات: " . $conn->connect_error);
 }
 
 if (!defined('JWT_SECRET_KEY')) {
