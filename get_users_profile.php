@@ -21,7 +21,7 @@ if (isset($headers['Authorization'])) {
 
             
             $query = "SELECT * FROM users WHERE User_id = ?";
-            $stmt = $conn->prepare($query);
+            $stmt = $con->prepare($query);
             $stmt->bind_param("i", $User_id);
             $stmt->execute();
             $user_result = $stmt->get_result()->fetch_assoc();
