@@ -28,21 +28,21 @@ if (isset($headers['Authorization'])) {
 
             
             $query = "SELECT * FROM experience WHERE User_id = ?";
-            $stmt = $conn->prepare($query);
+            $stmt = $con->prepare($query);
             $stmt->bind_param("i", $User_id);
             $stmt->execute();
             $experience_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
             
             $query = "SELECT * FROM certificate WHERE User_id = ?";
-            $stmt = $conn->prepare($query);
+            $stmt = $con->prepare($query);
             $stmt->bind_param("i", $User_id);
             $stmt->execute();
             $certificate_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
             
             $query = "SELECT * FROM skills WHERE User_id = ?";
-            $stmt = $conn->prepare($query);
+            $stmt = $con->prepare($query);
             $stmt->bind_param("i", $User_id);
             $stmt->execute();
             $skills_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
