@@ -1,32 +1,69 @@
 <?php
-require 'db_connection.php';
+require_once 'db_connection.php';
+require_once 'vendor/autoload.php'; 
 
-$User_id = isset($_GET['User_id']) ? mysqli_real_escape_string($con, $_GET['User_id']) : null;
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+
+$secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
 
-if ($User_id) {
-    
-    $sql_select = "SELECT * FROM user_profile WHERE User_id = $User_id";
-    $result = mysqli_query($con, $sql_select);
+$headers = getallheaders();
+if (isset($headers['Authorization'])) {
+    $authHeader = $headers['Authorization'];
+    list($jwt) = sscanf($authHeader, 'Bearer %s');
 
-    if (mysqli_num_rows($result) > 0) {
-        $profile = mysqli_fetch_assoc($result); 
-        echo json_encode($profile); 
+    if ($jwt) {
+        try {
+            
+            $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+            $user_id = $decoded->User_id;
+
+            
+            $query = "SELECT * FROM users WHERE User_id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $User_id);
+            $stmt->execute();
+            $user_result = $stmt->get_result()->fetch_assoc();
+
+            
+            $query = "SELECT * FROM experience WHERE User_id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $User_id);
+            $stmt->execute();
+            $experience_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+            
+            $query = "SELECT * FROM certificate WHERE User_id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $User_id);
+            $stmt->execute();
+            $certificate_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+            
+            $query = "SELECT * FROM skills WHERE User_id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("i", $User_id);
+            $stmt->execute();
+            $skills_result = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+            
+            $response = [
+                'user_info' => $user_result,
+                'experience' => $experience_result,
+                'certificate' => $certificate_result,
+                'skills' => $skills_result,
+            ];
+
+        
+            echo json_encode($response);
+        } catch (Exception $e) {
+            echo json_encode(['error' => 'Invalid token or unauthorized access']);
+        }
     } else {
-        echo json_encode(["status" => "error", "message" => "User profile not found"]);
+        echo json_encode(['error' => 'Authorization token not found']);
     }
 } else {
-    
-    $sql_select = "SELECT * FROM user_profile";
-    $result = mysqli_query($con, $sql_select);
-
-    if (mysqli_num_rows($result) > 0) {
-        $profiles = mysqli_fetch_all($result, MYSQLI_ASSOC); 
-        echo json_encode($profiles); 
-    } else {
-        echo json_encode(["status" => "error", "message" => "No user profiles found"]);
-    }
+    echo json_encode(['error' => 'Authorization header is missing']);
 }
-
-mysqli_close($con);
 ?>
