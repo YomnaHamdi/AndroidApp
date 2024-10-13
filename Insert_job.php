@@ -1,12 +1,5 @@
 <?php
-
 include_once 'db_connection.php';
-
-
-if (!$con) {
-    echo json_encode(array("message" => "Database connection failed: " . mysqli_connect_error()));
-    exit();
-}
 
 
 $data = json_decode(file_get_contents("php://input"), true);
@@ -45,5 +38,4 @@ if (
 
 
 mysqli_close($con);
-
 ?>
