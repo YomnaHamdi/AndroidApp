@@ -7,44 +7,57 @@ use \Firebase\JWT\Key;
 
 $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
-
 $data = json_decode(file_get_contents("php://input"), true);
 
-$headers = getallheaders();
-if (isset($headers['Authorization'])) {
-    $authHeader = $headers['Authorization'];
-    list($jwt) = sscanf($authHeader, 'Bearer %s');
 
-    if ($jwt) {
-        try {
-            // فك تشفير التوكن
-            $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-            $company_id = $decoded->Company_id; 
+if (
+    isset($data['Job_title']) &&
+    isset($data['Job_description']) &&
+    isset($data['salary']) &&
+    isset($data['location'])
+) {
 
-            if (isset($data['job_title']) && isset($data['job_description'])) {
-                $job_title = $data['job_title'];
-                $job_description = $data['job_description'];
+    $Job_title = $data['Job_title'];
+    $Job_description = $data['Job_description'];
+    $salary = $data['salary'];
+    $location = $data['location'];
 
-               
-                $sql_insert = "INSERT INTO jobs (Job_title, Job_description, Company_id) 
-                VALUES ('$job_title', '$job_description', '$company_id')";
+    
+    $headers = getallheaders();
+    if (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+        list($jwt) = sscanf($authHeader, 'Bearer %s');
 
-                if (mysqli_query($con, $sql_insert)) {
+        if ($jwt) {
+            try {
+                
+                $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+                $company_id = $decoded->data->Company_id; 
+
+                
+                $sql_insert = "INSERT INTO jobs (Job_title, Job_description, salary, location, Company_id) 
+                VALUES (?, ?, ?, ?, ?)";
+                
+                
+                $stmt = $con->prepare($sql_insert);
+                $stmt->bind_param("ssisi", $Job_title, $Job_description, $salary, $location, $company_id);
+
+                if ($stmt->execute()) {
                     echo json_encode(["status" => "success", "message" => "Job added successfully"]);
                 } else {
-                    echo json_encode(["status" => "error", "message" => "Error adding job: " . mysqli_error($con)]);
+                    echo json_encode(["status" => "error", "message" => "Error adding job: " . $stmt->error]);
                 }
-            } else {
-                echo json_encode(["status" => "error", "message" => "Invalid input"]);
+            } catch (Exception $e) {
+                echo json_encode(['error' => 'Invalid token or unauthorized access']);
             }
-        } catch (Exception $e) {
-            echo json_encode(['error' => 'Invalid token or unauthorized access']);
+        } else {
+            echo json_encode(['error' => 'Authorization token not found']);
         }
     } else {
-        echo json_encode(['error' => 'Authorization token not found']);
+        echo json_encode(['error' => 'Authorization header is missing']);
     }
 } else {
-    echo json_encode(['error' => 'Authorization header is missing']);
+    echo json_encode(["status" => "error", "message" => "Invalid input"]);
 }
 
 mysqli_close($con);
