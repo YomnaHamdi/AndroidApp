@@ -16,7 +16,14 @@ if (isset($headers['Authorization'])) {
         try {
             
             $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-            $company_id = $decoded->data->Company_id; 
+            
+            
+            if (isset($decoded->data)) {
+                $company_id = $decoded->data->Company_id; 
+            } else {
+                echo json_encode(['error' => 'Token does not contain company data']);
+                exit();
+            }
 
             
             if (isset($_GET['Job_id'])) {
@@ -27,7 +34,6 @@ if (isset($headers['Authorization'])) {
                 $result = $stmt->get_result();
                 echo json_encode($result->fetch_assoc());
             } else {
-                
                 $stmt = $con->prepare("SELECT * FROM jobs WHERE Company_id = ?");
                 $stmt->bind_param("i", $company_id);
                 $stmt->execute();
