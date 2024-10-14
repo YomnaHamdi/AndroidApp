@@ -1,11 +1,12 @@
 <?php
+
 include_once 'db_connection.php';
 
 if (isset($_GET['Job_id'])) {
     $Job_id = $_GET['Job_id'];
     $stmt = $con->prepare("
         SELECT jobs.*, companies.Company_name, companies.location, companies.industry
-        FROM jobs 
+        FROM jobs
         JOIN companies ON jobs.Company_id = companies.Company_id
         WHERE jobs.Job_id = ?
     ");
@@ -16,7 +17,7 @@ if (isset($_GET['Job_id'])) {
 } else {
     $result = $con->query("
         SELECT jobs.*, companies.Company_name, companies.location, companies.industry
-        FROM jobs 
+        FROM jobs
         JOIN companies ON jobs.Company_id = companies.Company_id
     ");
     $jobs = array();
@@ -27,4 +28,5 @@ if (isset($_GET['Job_id'])) {
 }
 
 mysqli_close($con);
+
 ?>
