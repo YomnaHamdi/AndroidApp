@@ -7,7 +7,6 @@ use \Firebase\JWT\Key;
 
 $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
-
 $data = json_decode(file_get_contents("php://input"), true);
 
 
@@ -32,11 +31,14 @@ if (
 
         
         $payload = [
-            "Company_id" => $Company_id,
-            "iat" => time(), // وقت الإصدار
-            "exp" => time() + (60 * 60) // وقت انتهاء الصلاحية (ساعة واحدة)
+            "data" => [  // تضمين Company_id داخل data
+                "Company_id" => $Company_id
+            ],
+            "iat" => time(), 
+            "exp" => time() + (60 * 60) 
         ];
 
+        
         $jwt = JWT::encode($payload, $secret_key, 'HS256');
 
         echo json_encode([
