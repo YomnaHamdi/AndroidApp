@@ -9,6 +9,9 @@ $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5";
 
 $data = json_decode(file_get_contents("php://input"), true);
 
+// طباعة البيانات المستلمة لمساعدتك في تتبع الخطأ
+error_log(print_r($data, true)); 
+
 
 if (
     isset($data['Job_title']) &&
@@ -16,13 +19,13 @@ if (
     isset($data['salary']) &&
     isset($data['location'])
 ) {
-
+    
     $Job_title = $data['Job_title'];
     $Job_description = $data['Job_description'];
     $salary = $data['salary'];
     $location = $data['location'];
 
-    
+   
     $headers = getallheaders();
     if (isset($headers['Authorization'])) {
         $authHeader = $headers['Authorization'];
@@ -30,11 +33,11 @@ if (
 
         if ($jwt) {
             try {
-                
+              
                 $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-                $company_id = $decoded->data->Company_id; 
+                $company_id = $decoded->data->Company_id; // استخراج Company_id
 
-                
+                // استعلام إدخال الوظيفة
                 $sql_insert = "INSERT INTO jobs (Job_title, Job_description, salary, location, Company_id) 
                 VALUES (?, ?, ?, ?, ?)";
                 
