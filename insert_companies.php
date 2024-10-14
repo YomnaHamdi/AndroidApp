@@ -16,26 +16,25 @@ if (
     isset($data['location']) &&
     isset($data['industry'])
 ) {
-    
     $Company_name = $data['Company_name'];
     $Contact_person = $data['Contact_person'];
     $location = $data['location'];
     $industry = $data['industry'];
 
-    
-    $sql_insert = "INSERT INTO companies (Company_name, Contact_person, location, industry) 
-    VALUES ('$Company_name', '$Contact_person', '$location', '$industry')";
 
-    if (mysqli_query($con, $sql_insert)) {
-        $Company_id = mysqli_insert_id($con);
+    $stmt = $con->prepare("INSERT INTO companies (Company_name, Contact_person, location, industry) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $Company_name, $Contact_person, $location, $industry);
+
+    if ($stmt->execute()) {
+        $Company_id = $stmt->insert_id;
 
         
         $payload = [
-            "data" => [  // تضمين Company_id داخل data
+            "data" => [
                 "Company_id" => $Company_id
             ],
-            "iat" => time(), 
-            "exp" => time() + (60 * 60) 
+            "iat" => time(),
+            "exp" => time() + (60 * 60)
         ];
 
         
@@ -48,8 +47,9 @@ if (
             "token" => $jwt 
         ]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Error adding company: " . mysqli_error($con)]);
+        echo json_encode(["status" => "error", "message" => "Error adding company: " . $stmt->error]);
     }
+    $stmt->close(); // أغلق الـ statement
 } else {
     echo json_encode(["status" => "error", "message" => "Invalid input"]);
 }
