@@ -35,9 +35,10 @@ if (
             try {
               
                 $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-                $company_id = $decoded->data->Company_id; // استخراج Company_id
+                error_log(print_r($decoded, true));
+                $company_id = $decoded->data->Company_id; 
 
-                // استعلام إدخال الوظيفة
+                
                 $sql_insert = "INSERT INTO jobs (Job_title, Job_description, salary, location, Company_id) 
                 VALUES (?, ?, ?, ?, ?)";
                 
