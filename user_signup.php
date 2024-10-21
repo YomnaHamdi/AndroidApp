@@ -1,7 +1,6 @@
 <?php
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 
 include 'db_connection.php'; 
 
@@ -12,28 +11,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $data = json_decode(file_get_contents("php://input"));
 
-    $username = $data->username ?? null;
-    $gender = $data->gender ?? null;
-    $location = $data->location ?? null;
-    $phone = $data->phone ?? null;
-    $about = $data->about ?? null;
-    $job_name = $data->job_name ?? null;
+    $User_name = $data->User_name ?? null;
+    $Gender = $data->Gender ?? null;
+    $Age = $data->Age ?? null;
+    $Phone = $data->Phone ?? null;
+    $Location = $data->Location ?? null;
+    $About = $data->About ?? null;
     $password = $data->password ?? null;
 
     
-    if (!$username || !$gender || !$location || !$phone || !$about || !$job_name || !$password) {
+    if (!$User_name || !$Gender || !$Age || !$Phone || !$Location || !$About || !$password) {
         echo json_encode(["error" => "All fields are required."]);
         http_response_code(400);
         exit();
     }
-
-    
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     
-    $sql_check = "SELECT * FROM users WHERE username = ?";
+    $sql_check = "SELECT * FROM users WHERE User_name = ?";
     $stmt_check = $conn->prepare($sql_check);
-    $stmt_check->bind_param("s", $username);
+    $stmt_check->bind_param("s", $User_name);
     $stmt_check->execute();
     $result_check = $stmt_check->get_result();
 
@@ -43,19 +40,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    
-    $sql = "INSERT INTO users (username, password, gender, location, phone, about, job_name) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    $sql = "INSERT INTO users (User_name, password, Gender, Age, Phone, Location, About,created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?,NOW())";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sssssss", $username, $hashedPassword, $gender, $location, $phone, $about, $job_name);
+    $stmt->bind_param("ssssssss", $User_name, $hashedPassword, $Gender, $Age, $Phone, $Location, $About);
 
     if ($stmt->execute()) {
-        
-        $user_id = $stmt->insert_id; 
-
     
+        $user_id = $stmt->insert_id;
+
+        
         $payload = [
-            'iat' => time(), 
+            'iat' => time(),
             'exp' => time() + (60 * 60), 
             'user_id' => $user_id,
             'username' => $username
