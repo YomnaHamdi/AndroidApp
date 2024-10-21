@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 $host = getenv('MYSQLHOST'); 
 $user = getenv('MYSQLUSER'); 
 $password = getenv('MYSQLPASSWORD'); 
-$dbname = getenv('MYSQLDATABASE'); 
+$dbname = getenv('MYSQL_DATABASE'); 
 $port = getenv('MYSQLPORT'); 
 
 // إنشاء الاتصال بقاعدة البيانات
