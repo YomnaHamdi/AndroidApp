@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    /
+    
     $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
     $stmt_user = $con->prepare($sql_user);
     $stmt_user->bind_param("i", $user_id);
