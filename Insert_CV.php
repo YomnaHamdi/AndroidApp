@@ -1,14 +1,13 @@
 <?php
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
-use Firebase\JWT\ExpiredException;
 
-include 'db_connection.php';
+include 'db_connection.php'; 
 
 $secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-   
+    
     $headers = getallheaders();
     $token = $headers['Authorization'] ?? null;
 
@@ -19,15 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-        
         $token = str_replace("Bearer ", "", $token);
-        
-        
         $decoded = JWT::decode($token, $secretKey, ['HS256']);
         $user_id = $decoded->user_id; 
-    } catch (ExpiredException $e) {
-        echo json_encode(["error" => "Token has expired."]);
-        exit();
     } catch (Exception $e) {
         echo json_encode(["error" => "Invalid token."]);
         exit();
@@ -43,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+   
     $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
     $stmt_user = $con->prepare($sql_user);
     $stmt_user->bind_param("i", $user_id);
@@ -58,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_name = $user_data['User_name'];
     $phone = $user_data['Phone'];
 
+    
     $sql_experience = "INSERT INTO experience (User_id, description) VALUES (?, ?)";
     $stmt_experience = $con->prepare($sql_experience);
     $stmt_experience->bind_param("is", $user_id, $description);
@@ -67,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+   
     foreach ($skills as $skill) {
         $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
         $stmt_skill = $con->prepare($sql_skill);
