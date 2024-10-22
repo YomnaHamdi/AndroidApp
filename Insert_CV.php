@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
+use Firebase\JWT\ExpiredException;
 
 include 'db_connection.php';
 
@@ -13,25 +14,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!$token) {
         echo json_encode(["error" => "Token is required."]);
+        http_response_code(401);
         exit();
     }
 
-   
     try {
+      
+        $token = str_replace("Bearer ", "", $token);
+        
         $decoded = JWT::decode($token, $secretKey, ['HS256']);
-        $user_id = $decoded->user_id; 
+        $user_id = $decoded->User_id;
+    } catch (ExpiredException $e) {
+        echo json_encode(["error" => "Token has expired."]);
+        exit();
     } catch (Exception $e) {
         echo json_encode(["error" => "Invalid token."]);
         exit();
     }
 
-   
     $data = json_decode(file_get_contents("php://input"));
 
     $skills = $data->skills ?? []; 
     $description = $data->description ?? null; 
 
-    
     if (!$description || empty($skills)) {
         echo json_encode(["error" => "All fields are required."]);
         exit();
@@ -53,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_name = $user_data['User_name'];
     $phone = $user_data['Phone'];
 
-  
+   
     $sql_experience = "INSERT INTO experience (User_id, description) VALUES (?, ?)";
     $stmt_experience = $con->prepare($sql_experience);
     $stmt_experience->bind_param("is", $user_id, $description);
@@ -76,7 +81,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     echo json_encode(["message" => "CV inserted successfully.", "user_name" => $user_name, "phone" => $phone]);
+
 } else {
     echo json_encode(["error" => "Method not allowed"]);
+
 }
 ?>
