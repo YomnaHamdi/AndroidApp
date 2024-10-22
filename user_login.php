@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'username' => $user['User_name']
     ];
 
-    $jwt = JWT::encode($payload,new Key( $secretKey,'HS256'));
+    $jwt = JWT::encode($payload, $secretKey,'HS256');
 
     echo json_encode(["message" => "Login successful", "token" => $jwt]);
 } else {
