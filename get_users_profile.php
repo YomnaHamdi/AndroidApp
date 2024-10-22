@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 
 include 'db_connection.php'; 
@@ -14,7 +15,7 @@ $token = isset($headers['Authorization']) ? str_replace('Bearer ', '', $headers[
 if ($token) {
     try {
        
-        $decoded = JWT::decode($token, $secretKey, ['HS256']);
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
         $user_id = $decoded->user_id; 
 
         $sql = "SELECT User_name, Gender, Age, Location, Phone, About FROM users WHERE User_id = ?";
