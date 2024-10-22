@@ -1,62 +1,52 @@
 <?php
+require 'vendor/autoload.php';
+use Firebase\JWT\JWT;
+include 'db_connection.php';
 
-include_once 'db_connection.php'; 
-require 'vendor/autoload.php'; 
-use \Firebase\JWT\JWT;
-use \Firebase\JWT\Key;
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $data = json_decode(file_get_contents("php://input"));
 
-$data = json_decode(file_get_contents("php://input"), true);
+    $username = $data->username ?? null;
+    $password = $data->password ?? null;
 
-if (isset($data['email']) && isset($data['password'])) {
-    $email = $data['email'];
-    $password = $data['password'];
-
-    $stmt = $con->prepare("SELECT User_id, password FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        $stmt->bind_result($User_id, $hashedPassword);
-        $stmt->fetch();
-
-        if (password_verify($password, $hashedPassword)) {
-            $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
-            $expiration_time = time() + (60 * 60); 
-            $token = array(
-                "iat" => time(),
-                "exp" => $expiration_time,
-                "data" => array(
-                    "User_id" => $User_id 
-                )
-            );
-
-            
-            $jwt = JWT::encode($token, $secret_key, 'HS256');
-
-            
-            try {
-                $decodedToken = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-                $userId = $decodedToken->data->User_id;
-
-                
-                echo json_encode(array(
-                    "message" => "Login successful",
-                    "jwt" => $jwt,
-                    "userId" => $userId
-                ));
-            } catch (Exception $e) {
-                echo json_encode(array("message" => "Error decoding JWT: " . $e->getMessage()));
-            }
-        } else {
-            echo json_encode(array("message" => "Invalid password"));
-        }
-    } else {
-        echo json_encode(array("message" => "User not found"));
+    if (!$username || !$password) {
+        http_response_code(400);
+        echo json_encode(["error" => "All fields are required."]);
+        exit();
     }
-} else {
-    echo json_encode(array("message" => "Invalid input"));
-}
 
-mysqli_close($con);
+    $sql = "SELECT * FROM users WHERE User_name = ?";
+    $stmt = $con->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        http_response_code(401);
+        echo json_encode(["error" => "Invalid username or password."]);
+        exit();
+    }
+
+    $user = $result->fetch_assoc();
+
+    if (!password_verify($password, $user['password'])) {
+        http_response_code(401);
+        echo json_encode(["error" => "Invalid username or password."]);
+        exit();
+    }
+
+    $secretKey = "your_secret_key";
+    $payload = [
+        'iat' => time(),
+        'exp' => time() + (60 * 60), // 1 hour
+        'user_id' => $user['User_id'],
+        'username' => $user['User_name']
+    ];
+
+    $jwt = JWT::encode($payload, $secretKey);
+
+    echo json_encode(["message" => "Login successful", "token" => $jwt]);
+} else {
+    echo json_encode(["error" => "Method not allowed"]);
+}
 ?>
