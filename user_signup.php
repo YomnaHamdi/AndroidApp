@@ -19,7 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $data->password ?? null;
 
     if (!$User_name || !$Gender || !$Age || !$Phone || !$Location || !$About || !$password) {
-        http_response_code(400);
         echo json_encode(["error" => "All fields are required."]);
         exit();
     }
