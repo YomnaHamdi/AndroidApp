@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 include 'db_connection.php'; 
 
@@ -19,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
         $token = str_replace("Bearer ", "", $token);
-        $decoded = JWT::decode($token, $secretKey, ['HS256']);
+        $decoded = JWT::decode($token,new Key( $secretKey, 'HS256'));
         $user_id = $decoded->user_id; 
     } catch (Exception $e) {
         echo json_encode(["error" => "Invalid token."]);
