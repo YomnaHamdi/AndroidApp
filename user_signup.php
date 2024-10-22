@@ -61,16 +61,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       
         $jwt = JWT::encode($payload, $secretKey, 'HS256');
 
-        http_response_code(201); 
+      
         echo json_encode(["message" => "Registration successful", "token" => $jwt]);
     } else {
-        http_response_code(500);
+       
         echo json_encode(["error" => "Error inserting data"]);
     }
 
     $stmt->close();
 } else {
-    http_response_code(405); 
+ 
     echo json_encode(["error" => "Method not allowed"]);
 }
 ?>
