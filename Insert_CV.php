@@ -19,11 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-      
+       
         $token = str_replace("Bearer ", "", $token);
         
-        $decoded = JWT::decode($token, $secretKey, ['HS256']);
-        $user_id = $decoded->User_id;
+        // تمرير المعامل الثالث كـ array فارغة
+        $decoded = JWT::decode($token, $secretKey, array('HS256'));
+        $user_id = $decoded->user_id;
     } catch (ExpiredException $e) {
         echo json_encode(["error" => "Token has expired."]);
         exit();
@@ -42,7 +43,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    
     $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
     $stmt_user = $con->prepare($sql_user);
     $stmt_user->bind_param("i", $user_id);
@@ -58,7 +58,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_name = $user_data['User_name'];
     $phone = $user_data['Phone'];
 
-   
     $sql_experience = "INSERT INTO experience (User_id, description) VALUES (?, ?)";
     $stmt_experience = $con->prepare($sql_experience);
     $stmt_experience->bind_param("is", $user_id, $description);
@@ -68,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    
     foreach ($skills as $skill) {
         $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
         $stmt_skill = $con->prepare($sql_skill);
@@ -84,6 +82,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 } else {
     echo json_encode(["error" => "Method not allowed"]);
-
 }
 ?>
