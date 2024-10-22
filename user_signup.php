@@ -1,76 +1,86 @@
 <?php
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
+use Firebase\JWT\ExpiredException;
 
-include 'db_connection.php'; 
+include 'db_connection.php';
 
 $secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    
+   
+    $headers = getallheaders();
+    $token = $headers['Authorization'] ?? null;
+
+    if (!$token) {
+        echo json_encode(["error" => "Token is required."]);
+        http_response_code(401);
+        exit();
+    }
+
+    try {
+        
+        $token = str_replace("Bearer ", "", $token);
+        
+        
+        $decoded = JWT::decode($token, $secretKey, ['HS256']);
+        $user_id = $decoded->user_id; 
+    } catch (ExpiredException $e) {
+        echo json_encode(["error" => "Token has expired."]);
+        exit();
+    } catch (Exception $e) {
+        echo json_encode(["error" => "Invalid token."]);
+        exit();
+    }
+
     $data = json_decode(file_get_contents("php://input"));
 
-    $User_name = $data->User_name ?? null;
-    $Gender = $data->Gender ?? null;
-    $Age = $data->Age ?? null;
-    $Phone = $data->Phone ?? null;
-    $Location = $data->Location ?? null;
-    $About = $data->About ?? null;
-    $password = $data->password ?? null;
+    $skills = $data->skills ?? []; 
+    $description = $data->description ?? null; 
 
- 
-    if (!$User_name || !$Gender || !$Age || !$Phone || !$Location || !$About || !$password) {
-        http_response_code(400);
+    if (!$description || empty($skills)) {
         echo json_encode(["error" => "All fields are required."]);
         exit();
     }
 
+    $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
+    $stmt_user = $con->prepare($sql_user);
+    $stmt_user->bind_param("i", $user_id);
+    $stmt_user->execute();
+    $result_user = $stmt_user->get_result();
 
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-   
-    $sql_check = "SELECT * FROM users WHERE User_name = ?";
-    $stmt_check = $con->prepare($sql_check);
-    $stmt_check->bind_param("s", $User_name);
-    $stmt_check->execute();
-    $result_check = $stmt_check->get_result();
-
-    if ($result_check->num_rows > 0) {
-        http_response_code(409);
-        echo json_encode(["error" => "Username already exists"]);
+    if ($result_user->num_rows === 0) {
+        echo json_encode(["error" => "User not found."]);
         exit();
     }
 
-    
-    $sql = "INSERT INTO users (User_name, password, Gender, Age, Phone, Location, About, created_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
-    $stmt = $con->prepare($sql);
-    $stmt->bind_param("sssssss", $User_name, $hashedPassword, $Gender, $Age, $Phone, $Location, $About);
+    $user_data = $result_user->fetch_assoc();
+    $user_name = $user_data['User_name'];
+    $phone = $user_data['Phone'];
 
-    if ($stmt->execute()) {
-        $user_id = $stmt->insert_id;
+    $sql_experience = "INSERT INTO experience (User_id, description) VALUES (?, ?)";
+    $stmt_experience = $con->prepare($sql_experience);
+    $stmt_experience->bind_param("is", $user_id, $description);
 
-      
-        $payload = [
-            'iat' => time(),
-            'exp' => time() + (60 * 60), 
-            'user_id' => $user_id,
-            'username' => $User_name
-        ];
-
-      
-        $jwt = JWT::encode($payload, $secretKey, 'HS256');
-
-      
-        echo json_encode(["message" => "Registration successful", "token" => $jwt]);
-    } else {
-       
-        echo json_encode(["error" => "Error inserting data"]);
+    if (!$stmt_experience->execute()) {
+        echo json_encode(["error" => "Error inserting experience data"]);
+        exit();
     }
 
-    $stmt->close();
+    foreach ($skills as $skill) {
+        $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
+        $stmt_skill = $con->prepare($sql_skill);
+        $stmt_skill->bind_param("is", $user_id, $skill);
+
+        if (!$stmt_skill->execute()) {
+            echo json_encode(["error" => "Error inserting skill data"]);
+            exit();
+        }
+    }
+
+    echo json_encode(["message" => "CV inserted successfully.", "user_name" => $user_name, "phone" => $phone]);
+
 } else {
- 
     echo json_encode(["error" => "Method not allowed"]);
 }
 ?>
