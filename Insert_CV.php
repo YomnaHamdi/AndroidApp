@@ -1,60 +1,82 @@
 <?php
-
-include_once 'db_connection.php'; 
 require 'vendor/autoload.php'; 
-use \Firebase\JWT\JWT;
-use \Firebase\JWT\Key;
+use Firebase\JWT\JWT;
 
-$data = json_decode(file_get_contents("php://input"), true);
+include 'db_connection.php';
 
-// احصل على التوكن من الهيدر (Authorization)
-$jwt = isset($_SERVER['HTTP_AUTHORIZATION']) ? str_replace('Bearer ', '', $_SERVER['HTTP_AUTHORIZATION']) : null;
+$secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
-if ($jwt) {
-    try {
-        $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
-        $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-        $User_id = $decoded->data->User_id; // احصل على User_id من التوكن
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+   
+    $headers = getallheaders();
+    $token = $headers['Authorization'] ?? null;
 
-        if (
-            isset($data['User_name']) &&
-            isset($data['Phone']) &&
-            isset($data['Languages']) &&
-            isset($data['Education']) 
-        ) {
-            
-            $stmt_check = $con->prepare("SELECT * FROM curriculum_vitae WHERE User_id = ?");
-            $stmt_check->bind_param("s", $User_id);
-            $stmt_check->execute();
-            $result = $stmt_check->get_result();
-
-            if ($result->num_rows > 0) {
-                echo json_encode(array("message" => "CV already exists for this user."));
-            } else {
-                
-                $stmt = $con->prepare("INSERT INTO curriculum_vitae (User_id, User_name, Phone, Created_at, Languages, Education) VALUES (?, ?, ?, NOW(), ?, ?)");
-                $stmt->bind_param("sssss", $User_id, $data['User_name'], $data['Phone'], $data['Languages'], $data['Education']);
-                
-                if ($stmt->execute()) {
-                    echo json_encode(array("message" => "CV uploaded successfully."));
-                } else {
-                    echo json_encode(array("message" => "Error: " . $stmt->error));
-                }
-            }
-        } else {
-            echo json_encode(array("message" => "Invalid input"));
-        }
-    } catch (Exception $e) {
-        echo json_encode(array(
-            "message" => "Access denied.",
-            "error" => $e->getMessage()
-        ));
+    if (!$token) {
+        echo json_encode(["error" => "Token is required."]);
+        exit();
     }
-} else {
-    echo json_encode(array(
-        "message" => "JWT not provided."
-    ));
-}
 
-mysqli_close($con);
+   
+    try {
+        $decoded = JWT::decode($token, $secretKey, ['HS256']);
+        $user_id = $decoded->user_id; 
+    } catch (Exception $e) {
+        echo json_encode(["error" => "Invalid token."]);
+        exit();
+    }
+
+   
+    $data = json_decode(file_get_contents("php://input"));
+
+    $skills = $data->skills ?? []; 
+    $description = $data->description ?? null; 
+
+    
+    if (!$description || empty($skills)) {
+        echo json_encode(["error" => "All fields are required."]);
+        exit();
+    }
+
+    
+    $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
+    $stmt_user = $con->prepare($sql_user);
+    $stmt_user->bind_param("i", $user_id);
+    $stmt_user->execute();
+    $result_user = $stmt_user->get_result();
+
+    if ($result_user->num_rows === 0) {
+        echo json_encode(["error" => "User not found."]);
+        exit();
+    }
+
+    $user_data = $result_user->fetch_assoc();
+    $user_name = $user_data['User_name'];
+    $phone = $user_data['Phone'];
+
+  
+    $sql_experience = "INSERT INTO experience (User_id, description) VALUES (?, ?)";
+    $stmt_experience = $con->prepare($sql_experience);
+    $stmt_experience->bind_param("is", $user_id, $description);
+
+    if (!$stmt_experience->execute()) {
+        echo json_encode(["error" => "Error inserting experience data"]);
+        exit();
+    }
+
+    
+    foreach ($skills as $skill) {
+        $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
+        $stmt_skill = $con->prepare($sql_skill);
+        $stmt_skill->bind_param("is", $user_id, $skill);
+
+        if (!$stmt_skill->execute()) {
+            echo json_encode(["error" => "Error inserting skill data"]);
+            exit();
+        }
+    }
+
+    echo json_encode(["message" => "CV inserted successfully.", "user_name" => $user_name, "phone" => $phone]);
+} else {
+    echo json_encode(["error" => "Method not allowed"]);
+}
 ?>
