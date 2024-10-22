@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 include 'db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -43,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         'username' => $user['User_name']
     ];
 
-    $jwt = JWT::encode($payload, $secretKey,'HS256');
+    $jwt = JWT::encode($payload,new Key( $secretKey,'HS256'));
 
     echo json_encode(["message" => "Login successful", "token" => $jwt]);
 } else {
