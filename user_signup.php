@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $sql = "INSERT INTO users (User_name, password, Gender, Age, Phone, Location, About,created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?,NOW())";
-    $stmt = $conn->prepare($sql);
+    $stmt = $con->prepare($sql);
     $stmt->bind_param("ssssssss", $User_name, $hashedPassword, $Gender, $Age, $Phone, $Location, $About);
 
     if ($stmt->execute()) {
