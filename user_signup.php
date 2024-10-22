@@ -18,17 +18,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $About = $data->About ?? null;
     $password = $data->password ?? null;
 
- 
     if (!$User_name || !$Gender || !$Age || !$Phone || !$Location || !$About || !$password) {
         http_response_code(400);
         echo json_encode(["error" => "All fields are required."]);
         exit();
     }
 
-
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-   
     $sql_check = "SELECT * FROM users WHERE User_name = ?";
     $stmt_check = $con->prepare($sql_check);
     $stmt_check->bind_param("s", $User_name);
@@ -41,7 +38,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    
     $sql = "INSERT INTO users (User_name, password, Gender, Age, Phone, Location, About, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
     $stmt = $con->prepare($sql);
@@ -50,7 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->execute()) {
         $user_id = $stmt->insert_id;
 
-      
         $payload = [
             'iat' => time(),
             'exp' => time() + (60 * 60), 
@@ -58,19 +53,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'username' => $User_name
         ];
 
-      
         $jwt = JWT::encode($payload, $secretKey, 'HS256');
 
-      
         echo json_encode(["message" => "Registration successful", "token" => $jwt]);
     } else {
-       
         echo json_encode(["error" => "Error inserting data"]);
     }
 
     $stmt->close();
 } else {
- 
     echo json_encode(["error" => "Method not allowed"]);
 }
 ?>
