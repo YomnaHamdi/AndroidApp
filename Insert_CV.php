@@ -19,12 +19,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     try {
-       
+        
         $token = str_replace("Bearer ", "", $token);
         
-        // تمرير المعامل الثالث كـ array فارغة
-        $decoded = JWT::decode($token, $secretKey, array('HS256'));
-        $user_id = $decoded->user_id;
+        
+        $decoded = JWT::decode($token, $secretKey, ['HS256']);
+        $user_id = $decoded->user_id; 
     } catch (ExpiredException $e) {
         echo json_encode(["error" => "Token has expired."]);
         exit();
