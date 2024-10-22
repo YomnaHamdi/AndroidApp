@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     
     $sql_check = "SELECT * FROM users WHERE User_name = ?";
-    $stmt_check = $conn->prepare($sql_check);
+    $stmt_check = $con->prepare($sql_check);
     $stmt_check->bind_param("s", $User_name);
     $stmt_check->execute();
     $result_check = $stmt_check->get_result();
