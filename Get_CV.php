@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     if (!$token) {
         echo json_encode(["error" => "Token is required."]);
+        http_response_code(401);
         exit();
     }
 
@@ -34,6 +35,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     if ($result->num_rows > 0) {
         $cv = $result->fetch_assoc();
+
+        
+        $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
+        $stmt_user = $con->prepare($sql_user);
+        $stmt_user->bind_param("i", $user_id);
+        $stmt_user->execute();
+        $result_user = $stmt_user->get_result();
+
+        if ($result_user->num_rows > 0) {
+            $user_data = $result_user->fetch_assoc();
+            $cv['user_name'] = $user_data['User_name'];
+            $cv['phone'] = $user_data['Phone'];
+        }
+
         
         $sql_skills = "SELECT skill_name FROM skills WHERE User_id = ?";
         $stmt_skills = $con->prepare($sql_skills);
