@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!$token) {
         echo json_encode(["error" => "Token is required."]);
-        
         exit();
     }
 
@@ -30,18 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    $data = json_decode(file_get_contents("php://input"));
-    $skills = $data->skills ?? []; 
-    $description = $data->description ?? null; 
-    $education = $data->Education ?? null;  
-    $languages = $data->Languages ?? [];    
-
-    if (!$description || empty($skills) || !$education || empty($languages)) {
-        echo json_encode(["error" => "All fields are required."]);
-        exit();
-    }
-
-    
     $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
     $stmt_user = $con->prepare($sql_user);
     $stmt_user->bind_param("i", $user_id);
@@ -57,7 +44,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $user_name = $user_data['User_name'];
     $phone = $user_data['Phone'];
 
- 
+  
+    $data = json_decode(file_get_contents("php://input"));
+    $skills = $data->skills ?? []; 
+    $description = $data->description ?? null; 
+    $education = $data->Education ?? null;  
+    $languages = $data->Languages ?? [];    
+
+    if (!$description || empty($skills) || !$education || empty($languages)) {
+        echo json_encode(["error" => "All fields are required."]);
+        exit();
+    }
+
     $sql_experience = "INSERT INTO experience (User_id, description) VALUES (?, ?)";
     $stmt_experience = $con->prepare($sql_experience);
     $stmt_experience->bind_param("is", $user_id, $description);
@@ -67,19 +65,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    
+    $languagesString = implode(',', $languages); 
     $sql_cv = "INSERT INTO curriculum_vitae (User_id, Languages, Education, Created_at) VALUES (?, ?, ?, NOW())";
     $stmt_cv = $con->prepare($sql_cv);
     $stmt_cv->bind_param("iss", $user_id, $languagesString, $education);
-
-    // تحويل مصفوفة اللغات إلى سلسلة
-    $languagesString = implode(',', $languages);
 
     if (!$stmt_cv->execute()) {
         echo json_encode(["error" => "Error inserting CV data"]);
         exit();
     }
 
-   
+    
     foreach ($skills as $skill) {
         $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
         $stmt_skill = $con->prepare($sql_skill);
