@@ -36,14 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    
     $sql_insert = "INSERT INTO companies (Email, Password) VALUES (?, ?)";
     $stmt_insert = $con->prepare($sql_insert);
     $stmt_insert->bind_param("ss", $email, $hashedPassword);
 
     if ($stmt_insert->execute()) {
-        
-        echo json_encode(["message" => "Sign up successful, please complete your company details.", "email" => $email]);
+        $payload = [
+            'iat' => time(),
+            'exp' => time() + (60 * 60), 
+            'company_email' => $email
+        ];
+
+        $jwt = JWT::encode($payload, $secretKey, 'HS256');
+
+        echo json_encode(["message" => "Sign up successful", "token" => $jwt]);
     } else {
         echo json_encode(["error" => "Error during registration."]);
     }
