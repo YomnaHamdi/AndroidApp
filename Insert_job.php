@@ -1,78 +1,55 @@
 <?php
-include_once 'db_connection.php';
-require_once 'vendor/autoload.php'; 
+require 'vendor/autoload.php';
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+include 'db_connection.php';
 
-use \Firebase\JWT\JWT;
-use \Firebase\JWT\Key;
+$secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5";
 
-$secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
-
-$data = json_decode(file_get_contents("php://input"), true);
-
-
-error_log(print_r($data, true)); 
-
-
-if (
-    isset($data['Job_title']) &&
-    isset($data['Job_description']) &&
-    isset($data['Employment_type']) &&
-    isset($data['Job_location']) &&
-    isset($data['Salary_range']) &&
-    isset($data['Requirements']) &&
-    isset($data['Job_type']) &&
-    isset($data['job_mode'])
-) {
-    
-    $Job_title = $data['Job_title'];
-    $Job_description = $data['Job_description'];
-    $Employment_type = $data['Employment_type'];
-    $Job_location = $data['Job_location'];
-    $Salary_range = $data['Salary_range'];
-    $Requirements = $data['Requirements'];
-    $Job_type = $data['Job_type'];
-    $job_mode = $data['job_mode'];
-
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $headers = getallheaders();
-    if (isset($headers['Authorization'])) {
-        $authHeader = $headers['Authorization'];
-        list($jwt) = sscanf($authHeader, 'Bearer %s');
+    $token = $headers['Authorization'] ?? null;
 
-        if ($jwt) {
-            try {
-                
-                $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-                $company_id = $decoded->data->Company_id; 
+    if (!$token) {
+        echo json_encode(["error" => "Token is required."]);
+        exit();
+    }
+
+    try {
+        $token = str_replace("Bearer ", "", $token);
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));  
+        $company_id = $decoded->Company_id;  
+    } catch (Exception $e) {
+        echo json_encode(["error" => "Invalid token: " . $e->getMessage()]);
+        exit();
+    }
+
+    $data = json_decode(file_get_contents("php://input"));
+    $job_title = $data->job_title ?? null;
+    $job_description = $data->job_description ?? null;
+    $job_type = $data->job_type ?? null;
+    $location = $data->location ?? null;
+    $salary = $data->salary ?? null;
+
+    if (!$job_title || !$job_description || !$job_type || !$location || !$salary) {
+        echo json_encode(["error" => "All fields are required."]);
+        exit();
+    }
 
     
-                error_log(print_r($decoded, true));
+    $sql = "INSERT INTO job_posts (Company_id, job_title, job_description, job_type, location, salary, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, NOW())";
+    $stmt = $con->prepare($sql);
+    $stmt->bind_param("isssss", $company_id, $job_title, $job_description, $job_type, $location, $salary);
 
-                
-                $sql_insert = "INSERT INTO jobs (Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Posted_at, Job_type, job_mode, Company_id) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)";
-
-                $stmt = $con->prepare($sql_insert);
-                $stmt->bind_param("ssssssssi", $Job_title, $Job_description, $Employment_type, $Job_location, $Salary_range, $Requirements, $Job_type, $job_mode, $company_id);
-
-                if ($stmt->execute()) {
-                    echo json_encode(["status" => "success", "message" => "Job added successfully"]);
-                } else {
-                    echo json_encode(["status" => "error", "message" => "Error adding job: " . $stmt->error]);
-                }
-                $stmt->close();
-            } catch (Exception $e) {
-                echo json_encode(['error' => 'Invalid token or unauthorized access']);
-            }
-        } else {
-            echo json_encode(['error' => 'Authorization token not found']);
-        }
+    if ($stmt->execute()) {
+        echo json_encode(["message" => "Job post added successfully."]);
     } else {
-        echo json_encode(['error' => 'Authorization header is missing']);
+        echo json_encode(["error" => "Error adding job post."]);
     }
-} else {
-    echo json_encode(["status" => "error", "message" => "Invalid input"]);
-}
 
-mysqli_close($con);
+} else {
+    echo json_encode(["error" => "Method not allowed"]);
+}
 ?>
