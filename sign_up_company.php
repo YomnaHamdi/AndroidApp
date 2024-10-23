@@ -23,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    
     $sql_check_email = "SELECT * FROM companies WHERE Email = ?";
     $stmt_check_email = $con->prepare($sql_check_email);
     $stmt_check_email->bind_param("s", $email);
@@ -35,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-  
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     
@@ -45,15 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($stmt_insert->execute()) {
         
-        $payload = [
-            'iat' => time(),
-            'exp' => time() + (60 * 60), 
-            'company_email' => $email
-        ];
-
-        $jwt = JWT::encode($payload, $secretKey, 'HS256');
-
-        echo json_encode(["message" => "Sign up successful", "token" => $jwt]);
+        echo json_encode(["message" => "Sign up successful, please complete your company details.", "email" => $email]);
     } else {
         echo json_encode(["error" => "Error during registration."]);
     }
