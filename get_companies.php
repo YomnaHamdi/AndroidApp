@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     
     $company_id = $_GET['Company_id'];
 
-    $sql_company = "SELECT Company_name, Company_location, Industry FROM companies WHERE Company_id = ?";
+    $sql_company = "SELECT Company_name,  Industry FROM companies WHERE Company_id = ?";
     $stmt_company = $con->prepare($sql_company);
     $stmt_company->bind_param("i", $company_id);
     $stmt_company->execute();
@@ -33,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     echo json_encode([
         "company_name" => $company_data['Company_name'],
-        "company_location" => $company_data['Company_location'],
         "industry" => $company_data['Industry'],
         "posts" => $posts
     ]);
