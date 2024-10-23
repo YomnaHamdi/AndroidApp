@@ -1,41 +1,55 @@
 <?php
-require 'db_connection.php';
+require 'vendor/autoload.php'; 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\ExpiredException;
 
+include 'db_connection.php'; 
 
-$User_id = mysqli_real_escape_string($con, $_POST['User_id']);
-$Gender = mysqli_real_escape_string($con, $_POST['Gender']);
-$Age = mysqli_real_escape_string($con, $_POST['Age']);
-$Location = mysqli_real_escape_string($con, $_POST['Location']);
-$Phone = mysqli_real_escape_string($con, $_POST['Phone']);
-$Bio = mysqli_real_escape_string($con, $_POST['Bio']);
-$User_image = mysqli_real_escape_string($con, $_POST['User_image']);
-$user_name = mysqli_real_escape_string($con, $_POST['user_name']);
-$email = mysqli_real_escape_string($con, $_POST['email']);
-$job_name = mysqli_real_escape_string($con, $_POST['job_name']);
+$secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
-
-if (is_numeric($User_id)) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    $sql_update = "UPDATE User_Profile SET 
-                   Gender='$Gender', 
-                   Age='$Age', 
-                   Location='$Location', 
-                   Phone='$Phone', 
-                   Bio='$Bio', 
-                   User_image='$User_image',
-                   user_name='$user_name',
-                   email='$email',
-                   job_name='$job_name'
-                   WHERE User_id=$User_id";
+    $headers = getallheaders();
+    $token = $headers['Authorization'] ?? null;
 
-    if (mysqli_query($con, $sql_update)) {
-        echo json_encode(["status" => "success", "message" => "User profile updated successfully"]);
-    } else {
-        echo json_encode(["status" => "error", "message" => "Error updating user profile: " . mysqli_error($con)]);
+    if (!$token) {
+        echo json_encode(["error" => "Token is required."]);
+        http_response_code(401);
+        exit();
     }
-} else {
-    echo json_encode(["status" => "error", "message" => "Invalid User ID"]);
-}
 
-mysqli_close($con);
+    try {
+        $token = str_replace("Bearer ", "", $token);
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+        $user_id = $decoded->user_id;
+
+        
+        $User_name = $_POST['User_name'] ?? null;
+        $Age = $_POST['Age'] ?? null;
+        $Phone = $_POST['Phone'] ?? null;
+        $Location = $_POST['Location'] ?? null;
+        $About = $_POST['About'] ?? null;
+
+        $sql = "UPDATE users SET User_name = ?, Age = ?, Phone = ?, Location = ?, About = ? WHERE User_id = ?";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("sssssi", $User_name, $Age, $Phone, $Location, $About, $user_id);
+
+        if ($stmt->execute()) {
+            echo json_encode(["message" => "Profile updated successfully."]);
+        } else {
+            echo json_encode(["error" => "Error updating profile."]);
+        }
+
+    } catch (ExpiredException $e) {
+        echo json_encode(["error" => "Token has expired."]);
+        exit();
+    } catch (Exception $e) {
+        echo json_encode(["error" => "Invalid token."]);
+        exit();
+    }
+
+} else {
+    echo json_encode(["error" => "Method not allowed"]);
+}
 ?>

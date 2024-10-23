@@ -1,82 +1,66 @@
 <?php
-
-include_once 'db_connection.php'; 
 require 'vendor/autoload.php'; 
-use \Firebase\JWT\JWT;
+use Firebase\JWT\JWT;
 
-$data = json_decode(file_get_contents("php://input"), true);
+include 'db_connection.php'; 
 
-if (
-    isset($data['email']) &&
-    isset($data['password']) &&
-    isset($data['confirm_password'])
-) {
-    $email = mysqli_real_escape_string($con, $data['email']);
-    $password = $data['password'];
-    $confirmPassword = $data['confirm_password'];
+$secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
-    // تحقق من تطابق كلمة المرور
-    if ($password !== $confirmPassword) {
-        echo json_encode(array("message" => "Passwords do not match"));
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    
+    $data = json_decode(file_get_contents("php://input"));
+
+    $User_name = $data->User_name ?? null;
+    $Gender = $data->Gender ?? null;
+    $Age = $data->Age ?? null;
+    $Phone = $data->Phone ?? null;
+    $Location = $data->Location ?? null;
+    $About = $data->About ?? null;
+    $password = $data->password ?? null;
+
+    if (!$User_name || !$Gender || !$Age || !$Phone || !$Location || !$About || !$password) {
+        echo json_encode(["error" => "All fields are required."]);
         exit();
     }
 
-    
-    $stmt = $con->prepare("SELECT User_id FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
-
-    if ($stmt->num_rows > 0) {
-        echo json_encode(array("message" => "User already exists"));
-        exit();
-    }
-
-    
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-    
-    $stmt = $con->prepare("INSERT INTO users (email, password, created_at) VALUES (?, ?, NOW())");
-    $stmt->bind_param("ss", $email, $hashedPassword);
+    $sql_check = "SELECT * FROM users WHERE User_name = ?";
+    $stmt_check = $con->prepare($sql_check);
+    $stmt_check->bind_param("s", $User_name);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+
+    if ($result_check->num_rows > 0) {
+        http_response_code(409);
+        echo json_encode(["error" => "Username already exists"]);
+        exit();
+    }
+
+    $sql = "INSERT INTO users (User_name, password, Gender, Age, Phone, Location, About, created_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+    $stmt = $con->prepare($sql);
+    $stmt->bind_param("sssssss", $User_name, $hashedPassword, $Gender, $Age, $Phone, $Location, $About);
 
     if ($stmt->execute()) {
-        $User_id = $stmt->insert_id; 
-        $secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
-        $expiration_time = time() + (60 * 60); 
-        $token = array(
-            "iat" => time(),
-            "exp" => $expiration_time,
-            "data" => array(
-                "User_id" => $User_id 
-            )
-        );
+        $user_id = $stmt->insert_id;
 
-        
-        $jwt = JWT::encode($token, $secret_key, 'HS256');
+        $payload = [
+            'iat' => time(),
+            'exp' => time() + (60 * 60), 
+            'user_id' => $user_id,
+            'username' => $User_name
+        ];
 
-        
-        try {
-            $decodedToken = JWT::decode($jwt, new \Firebase\JWT\Key($secret_key, 'HS256'));
-            $userId = $decodedToken->data->User_id;
+        $jwt = JWT::encode($payload, $secretKey, 'HS256');
 
-            
-            $link = "https://androidapp-production.up.railway.app/token?key=$userId";
-
-            
-            echo json_encode(array(
-                "message" => "User registered successfully",
-                "jwt" => $jwt, 
-                "link" => $link 
-            ));
-        } catch (Exception $e) {
-            echo json_encode(array("message" => "Error decoding JWT: " . $e->getMessage()));
-        }
+        echo json_encode(["message" => "Registration successful", "token" => $jwt]);
     } else {
-        echo json_encode(array("message" => "Error: " . $stmt->error));
+        echo json_encode(["error" => "Error inserting data"]);
     }
-} else {
-    echo json_encode(array("message" => "Invalid input"));
-}
 
-mysqli_close($con);
+    $stmt->close();
+} else {
+    echo json_encode(["error" => "Method not allowed"]);
+}
 ?>

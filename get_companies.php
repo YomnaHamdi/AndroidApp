@@ -2,18 +2,18 @@
 require 'db_connection.php';
 
 
-$company_id = isset($_GET['company_id']) ? intval($_GET['company_id']) : 0;
+$Company_id = isset($_GET['Company_id']) ? intval($_GET['Company_id']) : 0;
 
 
-if ($company_id <= 0) {
+if ($Company_id <= 0) {
     echo json_encode(["status" => "error", "message" => "Invalid Company ID"]);
     exit();
 }
 
-$company_id = mysqli_real_escape_string($con, $company_id);
+$Company_id = mysqli_real_escape_string($con, $Company_id);
 
 
-$sql_select = "SELECT * FROM companies WHERE company_id = $company_id";
+$sql_select = "SELECT * FROM companies WHERE Company_id = $Company_id";
 $result = mysqli_query($con, $sql_select);
 
 if (!$result) {

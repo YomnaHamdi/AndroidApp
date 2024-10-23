@@ -1,12 +1,19 @@
 <?php
-
 include_once 'db_connection.php';
+require_once 'vendor/autoload.php'; 
+
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+
+$secret_key = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
 $data = json_decode(file_get_contents("php://input"), true);
 
+
+error_log(print_r($data, true)); 
+
+
 if (
-    
-    isset($data['Company_id']) &&
     isset($data['Job_title']) &&
     isset($data['Job_description']) &&
     isset($data['Employment_type']) &&
@@ -14,27 +21,58 @@ if (
     isset($data['Salary_range']) &&
     isset($data['Requirements']) &&
     isset($data['Job_type']) &&
-    isset($data['star']) && 
-    isset($data['Date']) &&
-    isset($data['job_mode']) &&
-    isset($data['industry']) &&
-    isset($data['company_name']) 
+    isset($data['job_mode'])
 ) {
     
-    $stmt = $con->prepare("INSERT INTO jobs ( Company_id, Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Job_type, Posted_at, star,Date,job_mode,industry, company_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?,?,?,?, ?)");
+    $Job_title = $data['Job_title'];
+    $Job_description = $data['Job_description'];
+    $Employment_type = $data['Employment_type'];
+    $Job_location = $data['Job_location'];
+    $Salary_range = $data['Salary_range'];
+    $Requirements = $data['Requirements'];
+    $Job_type = $data['Job_type'];
+    $job_mode = $data['job_mode'];
+
     
+    $headers = getallheaders();
+    if (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+        list($jwt) = sscanf($authHeader, 'Bearer %s');
+
+        if ($jwt) {
+            try {
+                
+                $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
+                $company_id = $decoded->data->Company_id; 
+
     
-    $stmt->bind_param("isssssssissss",  $data['Company_id'], $data['Job_title'], $data['Job_description'], $data['Employment_type'], $data['Job_location'], $data['Salary_range'], $data['Requirements'], $data['Job_type'], $data['star'],$data['Date'],$data['job_mode'],$data['industry'], $data['company_name']);
-    
-    if ($stmt->execute()) {
-        echo json_encode(array("message" => "Job created successfully."));
+                error_log(print_r($decoded, true));
+
+                
+                $sql_insert = "INSERT INTO jobs (Job_title, Job_description, Employment_type, Job_location, Salary_range, Requirements, Posted_at, Job_type, job_mode, Company_id) 
+                VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?)";
+
+                $stmt = $con->prepare($sql_insert);
+                $stmt->bind_param("ssssssssi", $Job_title, $Job_description, $Employment_type, $Job_location, $Salary_range, $Requirements, $Job_type, $job_mode, $company_id);
+
+                if ($stmt->execute()) {
+                    echo json_encode(["status" => "success", "message" => "Job added successfully"]);
+                } else {
+                    echo json_encode(["status" => "error", "message" => "Error adding job: " . $stmt->error]);
+                }
+                $stmt->close();
+            } catch (Exception $e) {
+                echo json_encode(['error' => 'Invalid token or unauthorized access']);
+            }
+        } else {
+            echo json_encode(['error' => 'Authorization token not found']);
+        }
     } else {
-        echo json_encode(array("message" => "Error: " . $stmt->error));
+        echo json_encode(['error' => 'Authorization header is missing']);
     }
 } else {
-    echo json_encode(array("message" => "Invalid input"));
+    echo json_encode(["status" => "error", "message" => "Invalid input"]);
 }
 
 mysqli_close($con);
-
 ?>
