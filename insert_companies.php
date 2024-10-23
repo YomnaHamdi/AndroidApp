@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $token = str_replace("Bearer ", "", $token);
         $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));  
-        $email = $decoded->company_email; 
+        $email = $decoded->company_email; // استخدام البريد الإلكتروني من التوكن
 
         $data = json_decode(file_get_contents("php://input"));
         $companyName = $data->companyName ?? null;
@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
+        
         $sql_insert = "UPDATE companies SET Company_name = ?, Company_location = ?, Industry = ? WHERE Email = ?";
         $stmt_insert = $con->prepare($sql_insert);
         $stmt_insert->bind_param("ssss", $companyName, $companyLocation, $industry, $email);
