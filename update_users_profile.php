@@ -22,9 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         $token = str_replace("Bearer ", "", $token);
         $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+        
+        // سجل البيانات المفككة في ملف log.txt للتحقق
+        file_put_contents('log.txt', print_r($decoded, true), FILE_APPEND);
+
         $user_id = $decoded->user_id;
 
-        
         $User_name = $_POST['User_name'] ?? null;
         $Age = $_POST['Age'] ?? null;
         $Phone = $_POST['Phone'] ?? null;
