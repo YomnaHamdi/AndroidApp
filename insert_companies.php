@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
 
+        
         $sql_insert = "UPDATE companies SET Company_name = ?, Company_location = ?, Industry = ? WHERE Email = ?";
         $stmt_insert = $con->prepare($sql_insert);
         $stmt_insert->bind_param("ssss", $companyName, $companyLocation, $industry, $email);

@@ -1,33 +1,43 @@
 <?php
-require 'db_connection.php';
+include 'db_connection.php'; 
 
+if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+    
+    
+    $company_id = $_GET['Company_id'];
 
-$Company_id = isset($_GET['Company_id']) ? intval($_GET['Company_id']) : 0;
+    $sql_company = "SELECT Company_name,  Industry FROM companies WHERE Company_id = ?";
+    $stmt_company = $con->prepare($sql_company);
+    $stmt_company->bind_param("i", $company_id);
+    $stmt_company->execute();
+    $result_company = $stmt_company->get_result();
 
+    if ($result_company->num_rows === 0) {
+        echo json_encode(["error" => "Company not found."]);
+        exit();
+    }
 
-if ($Company_id <= 0) {
-    echo json_encode(["status" => "error", "message" => "Invalid Company ID"]);
-    exit();
-}
+    $company_data = $result_company->fetch_assoc();
+    
+   
+    $sql_posts = "SELECT job_title, job_description, job_type, salary, created_at FROM job_posts WHERE Company_id = ?";
+    $stmt_posts = $con->prepare($sql_posts);
+    $stmt_posts->bind_param("i", $company_id);
+    $stmt_posts->execute();
+    $result_posts = $stmt_posts->get_result();
+    
+    $posts = [];
+    while ($post = $result_posts->fetch_assoc()) {
+        $posts[] = $post;
+    }
 
-$Company_id = mysqli_real_escape_string($con, $Company_id);
+    echo json_encode([
+        "company_name" => $company_data['Company_name'],
+        "industry" => $company_data['Industry'],
+        "posts" => $posts
+    ]);
 
-
-$sql_select = "SELECT * FROM companies WHERE Company_id = $Company_id";
-$result = mysqli_query($con, $sql_select);
-
-if (!$result) {
-    echo json_encode(["status" => "error", "message" => "Error executing query: " . mysqli_error($con)]);
-    mysqli_close($con);
-    exit();
-}
-
-if (mysqli_num_rows($result) > 0) {
-    $company = mysqli_fetch_assoc($result);
-    echo json_encode($company);
 } else {
-    echo json_encode(["status" => "error", "message" => "Company not found"]);
+    echo json_encode(["error" => "Method not allowed"]);
 }
-
-mysqli_close($con);
 ?>

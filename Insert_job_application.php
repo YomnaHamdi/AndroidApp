@@ -1,22 +1,55 @@
 <?php
+require 'vendor/autoload.php';
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+include 'db_connection.php';
 
-include_once 'db_connection.php';
+$secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5"; 
 
-$data = json_decode(file_get_contents("php://input"), true);
 
-if ( isset($data['User_id']) && isset($data['job_id']) && isset($data['Status']) && isset($data['cv_id'])) {
-    $stmt = $con->prepare("INSERT INTO job_application ( User_id, job_id, Status, applied_at, cv_id) VALUES (?, ?, ?,?, NOW(), ?)");
-    $stmt->bind_param("iisi", $data['User_id'], $data['job_id'], $data['Status'], $data['cv_id']);
-    
-    if ($stmt->execute()) {
-        echo json_encode(array("message" => "Job application created successfully."));
-    } else {
-        echo json_encode(array("message" => "Error: " . $stmt->error));
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $headers = getallheaders();
+    $token = $headers['Authorization'] ?? null;
+
+    if (!$token) {
+        echo json_encode(["error" => "Token is required."]);
+        exit();
     }
+
+    try {
+       
+        $token = str_replace("Bearer ", "", $token);
+    
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));  
+        $userId = $decoded->user_id; 
+
+   
+        $data = json_decode(file_get_contents("php://input"));
+        $jobId = $data->job_id ?? null;
+
+        if (!$jobId) {
+            echo json_encode(["error" => "Job ID is required."]);
+            exit();
+        }
+
+        
+        $sql_insert = "INSERT INTO job_application (User_id, job_id) VALUES (?, ?)";
+        $stmt_insert = $con->prepare($sql_insert);
+        $stmt_insert->bind_param("ii", $userId, $jobId); 
+
+        if ($stmt_insert->execute()) {
+            echo json_encode(["message" => "Application submitted successfully."]);
+        } else {
+            echo json_encode(["error" => "Error submitting application."]);
+        }
+
+    } catch (Exception $e) {
+        // إذا حدث خطأ في فك التوكن
+        echo json_encode(["error" => "Invalid token: " . $e->getMessage()]);
+        exit();
+    }
+
 } else {
-    echo json_encode(array("message" => "Invalid input"));
+    echo json_encode(["error" => "Method not allowed"]);
 }
-
-mysqli_close($con);
-
 ?>
