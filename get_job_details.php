@@ -15,9 +15,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     }
 
     // البحث عن تفاصيل الوظيفة باستخدام job_id
-    $sql = "SELECT job_title, job_description, Company_name, Company_location, salary, created_at 
-            FROM job_posts 
-            WHERE job_id = ?"; // استخدام job_id في الاستعلام
+    $sql = "
+        SELECT j.job_title, j.job_description, c.Company_name, c.Company_location, j.salary, j.created_at 
+        FROM job_posts j 
+        JOIN companies c ON j.Company_id = c.Company_id 
+        WHERE j.job_id = ?";
+        
     $stmt = $con->prepare($sql);
     $stmt->bind_param("i", $jobId);
     $stmt->execute();
