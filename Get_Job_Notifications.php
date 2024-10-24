@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $company_id = $decoded->Company_id;  
 
         // استرجاع الإشعارات بناءً على الوظائف والأشخاص الذين تقدموا
-        $sql = "SELECT j.job_title, u.id as User_id, u.User_name, n.Sent_at 
+        $sql = "SELECT j.job_title, u.User_id as User_id, u.User_name, n.Sent_at 
                 FROM job_notifications n
                 JOIN users u ON n.User_id = u.id
                 JOIN job_posts j ON n.job_id = j.id
