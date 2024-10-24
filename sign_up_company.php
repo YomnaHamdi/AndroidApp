@@ -23,6 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    
     $sql_check_email = "SELECT * FROM companies WHERE Email = ?";
     $stmt_check_email = $con->prepare($sql_check_email);
     $stmt_check_email->bind_param("s", $email);
@@ -34,6 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
+    
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
     $sql_insert = "INSERT INTO companies (Email, Password) VALUES (?, ?)";
@@ -41,10 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt_insert->bind_param("ss", $email, $hashedPassword);
 
     if ($stmt_insert->execute()) {
+        
+        $company_id = $con->insert_id;
+
+        
         $payload = [
             'iat' => time(),
-            'exp' => time() + (60 * 60), 
-            'company_email' => $email
+            'exp' => time() + (60 * 60), // التوكن صالح لمدة ساعة
+            'company_email' => $email,
+            'Company_id' => $company_id  
         ];
 
         $jwt = JWT::encode($payload, $secretKey, 'HS256');
