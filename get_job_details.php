@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     if (empty($jobId)) {
         echo json_encode(["error" => "Job ID is required."]);
-        http_response_code(400);
         exit();
     }
 
