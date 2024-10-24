@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     // استخدام SQL LIKE للبحث عن الوظائف مع JOIN مع جدول companies
     $sql = "SELECT j.job_title, j.job_description, c.Company_name, c.Company_location, j.salary, j.created_at, j.job_id 
-            FROM job_posts
+            FROM job_posts j
             JOIN companies c ON j.Company_id = c.Company_id 
             WHERE j.job_title LIKE ? OR c.Company_name LIKE ?";
 
