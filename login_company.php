@@ -37,11 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    
     $payload = [
         'iat' => time(),
         'exp' => time() + (60 * 60), 
-        'company_email' => $company['Email']
+        'company_email' => $company['Email'],
+        'Company_id' => $company['Company_id'] 
     ];
 
     $jwt = JWT::encode($payload, $secretKey, 'HS256');
