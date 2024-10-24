@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit();
     }
 
-    $secretKey = "9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5";
+    $secretKey = "9%fG8@h7!wQ4\$zR2*vX3&bJ1#nL6!mP5";
     $payload = [
         'iat' => time(),
         'exp' => time() + (60 * 60), // 1 hour
