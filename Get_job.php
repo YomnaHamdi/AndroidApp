@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     // استخدام SQL LIKE للبحث عن الوظائف
     $sql = "SELECT job_title, job_description, Company_name, Company_location, salary, created_at, job_id 
-            FROM jobs 
+            FROM job_posts 
             WHERE job_title LIKE ? OR Company_name LIKE ?";
 
     $stmt = $con->prepare($sql);
@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    $jobs = [];
+    $job_posts = [];
     while ($row = $result->fetch_assoc()) {
         $jobs[] = $row;
     }
