@@ -25,29 +25,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         $user_id = $decoded->user_id;
 
-        // قراءة الحقول المرسلة فقط
+        // قراءة بيانات JSON
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        // التأكد من الحقول المرسلة فقط
         $fields = [];
         $params = [];
         
-        if (isset($_POST['User_name'])) {
+        if (isset($data['User_name'])) {
             $fields[] = "User_name = ?";
-            $params[] = $_POST['User_name'];
+            $params[] = $data['User_name'];
         }
-        if (isset($_POST['Age'])) {
+        if (isset($data['Age'])) {
             $fields[] = "Age = ?";
-            $params[] = $_POST['Age'];
+            $params[] = $data['Age'];
         }
-        if (isset($_POST['Phone'])) {
+        if (isset($data['Phone'])) {
             $fields[] = "Phone = ?";
-            $params[] = $_POST['Phone'];
+            $params[] = $data['Phone'];
         }
-        if (isset($_POST['Location'])) {
+        if (isset($data['Location'])) {
             $fields[] = "Location = ?";
-            $params[] = $_POST['Location'];
+            $params[] = $data['Location'];
         }
-        if (isset($_POST['About'])) {
+        if (isset($data['About'])) {
             $fields[] = "About = ?";
-            $params[] = $_POST['About'];
+            $params[] = $data['About'];
         }
 
         if (empty($fields)) {
