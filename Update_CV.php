@@ -1,4 +1,9 @@
 <?php
+// عرض الأخطاء لتسهيل التحقق من أي مشاكل
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 require 'vendor/autoload.php'; 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;  
@@ -43,63 +48,53 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     $user_name = $user_data['User_name'];
     $phone = $user_data['Phone'];
 
-   
     $data = json_decode(file_get_contents("php://input"));
-    $skills = $data->skills ?? null; 
+    $skills = $data->skills ?? []; 
     $description = $data->description ?? null; 
     $education = $data->Education ?? null;  
-    $languages = $data->Languages ?? null;    
+    $languages = $data->Languages ?? [];    
+
+    if (!$description || empty($skills) || !$education || empty($languages)) {
+        echo json_encode(["error" => "All fields are required."]);
+        exit();
+    }
+
+  
+    $sql_cv = "UPDATE curriculum_vitae SET Languages = ?, Education = ? WHERE User_id = ?";
+    $stmt_cv = $con->prepare($sql_cv);
+    $stmt_cv->bind_param("ssi", implode(',', $languages), $education, $user_id);
+
+    if (!$stmt_cv->execute()) {
+        echo json_encode(["error" => "Error updating CV data"]);
+        exit();
+    }
 
     
-    if ($languages || $education) {
-        $sql_cv = "UPDATE curriculum_vitae SET ";
-        $params = [];
-        $types = "";
+    $sql_delete_skills = "DELETE FROM skills WHERE User_id = ?";
+    $stmt_delete_skills = $con->prepare($sql_delete_skills);
+    $stmt_delete_skills->bind_param("i", $user_id);
+    $stmt_delete_skills->execute();
 
-        if ($languages) {
-            $sql_cv .= "Languages = ?, ";
-            $params[] = implode(',', $languages);
-            $types .= "s";
-        }
-        if ($education) {
-            $sql_cv .= "Education = ?, ";
-            $params[] = $education;
-            $types .= "s";
-        }
+   
+    foreach ($skills as $skill) {
+        $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
+        $stmt_skill = $con->prepare($sql_skill);
+        $stmt_skill->bind_param("is", $user_id, $skill);
 
-        $sql_cv = rtrim($sql_cv, ", ");
-        $sql_cv .= " WHERE User_id = ?";
-        $params[] = $user_id;
-        $types .= "i";
-
-        $stmt_cv = $con->prepare($sql_cv);
-        $stmt_cv->bind_param($types, ...$params);
-
-        if (!$stmt_cv->execute()) {
-            echo json_encode(["error" => "Error updating CV data"]);
+        if (!$stmt_skill->execute()) {
+            echo json_encode(["error" => "Error inserting skill data"]);
             exit();
         }
     }
 
-    
-    if ($skills) {
-        
-        $sql_delete_skills = "DELETE FROM skills WHERE User_id = ?";
-        $stmt_delete_skills = $con->prepare($sql_delete_skills);
-        $stmt_delete_skills->bind_param("i", $user_id);
-        $stmt_delete_skills->execute();
 
-        
-        foreach ($skills as $skill) {
-            $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
-            $stmt_skill = $con->prepare($sql_skill);
-            $stmt_skill->bind_param("is", $user_id, $skill);
+    $sql_update_experience = "UPDATE experience SET description = ? WHERE User_id = ?";
+    $stmt_experience = $con->prepare($sql_update_experience);
+    $stmt_experience->bind_param("si", $description, $user_id);
 
-            if (!$stmt_skill->execute()) {
-                echo json_encode(["error" => "Error inserting skill data"]);
-                exit();
-            }
-        }
+    if (!$stmt_experience->execute()) {
+        echo json_encode(["error" => "Error updating description in experience"]);
+        exit();
     }
 
     echo json_encode(["message" => "CV updated successfully.", "user_name" => $user_name, "phone" => $phone]);
@@ -107,4 +102,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
 } else {
     echo json_encode(["error" => "Method not allowed"]);
 }
-?>
