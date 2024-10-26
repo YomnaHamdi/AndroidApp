@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
         exit();
     }
 
-    
+   
     $sql_user = "SELECT User_name, Phone FROM users WHERE User_id = ?";
     $stmt_user = $con->prepare($sql_user);
     $stmt_user->bind_param("i", $user_id);
@@ -49,52 +49,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'PUT') {
     $phone = $user_data['Phone'];
 
     $data = json_decode(file_get_contents("php://input"));
-    $skills = $data->skills ?? []; 
+    $skills = $data->skills ?? null; 
     $description = $data->description ?? null; 
     $education = $data->Education ?? null;  
-    $languages = $data->Languages ?? [];    
+    $languages = $data->Languages ?? null;
 
-    if (!$description || empty($skills) || !$education || empty($languages)) {
-        echo json_encode(["error" => "All fields are required."]);
-        exit();
-    }
+    if ($languages !== null || $education !== null) {
+        $sql_cv = "UPDATE curriculum_vitae SET Languages = IFNULL(?, Languages), Education = IFNULL(?, Education) WHERE User_id = ?";
+        $stmt_cv = $con->prepare($sql_cv);
+        $stmt_cv->bind_param("ssi", $languages ? implode(',', $languages) : null, $education, $user_id);
 
-  
-    $sql_cv = "UPDATE curriculum_vitae SET Languages = ?, Education = ? WHERE User_id = ?";
-    $stmt_cv = $con->prepare($sql_cv);
-    $stmt_cv->bind_param("ssi", implode(',', $languages), $education, $user_id);
-
-    if (!$stmt_cv->execute()) {
-        echo json_encode(["error" => "Error updating CV data"]);
-        exit();
-    }
-
-    
-    $sql_delete_skills = "DELETE FROM skills WHERE User_id = ?";
-    $stmt_delete_skills = $con->prepare($sql_delete_skills);
-    $stmt_delete_skills->bind_param("i", $user_id);
-    $stmt_delete_skills->execute();
-
-   
-    foreach ($skills as $skill) {
-        $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
-        $stmt_skill = $con->prepare($sql_skill);
-        $stmt_skill->bind_param("is", $user_id, $skill);
-
-        if (!$stmt_skill->execute()) {
-            echo json_encode(["error" => "Error inserting skill data"]);
+        if (!$stmt_cv->execute()) {
+            echo json_encode(["error" => "Error updating CV data"]);
             exit();
         }
     }
 
+    
+    if ($skills !== null) {
+      
+        $sql_delete_skills = "DELETE FROM skills WHERE User_id = ?";
+        $stmt_delete_skills = $con->prepare($sql_delete_skills);
+        $stmt_delete_skills->bind_param("i", $user_id);
+        $stmt_delete_skills->execute();
 
-    $sql_update_experience = "UPDATE experience SET description = ? WHERE User_id = ?";
-    $stmt_experience = $con->prepare($sql_update_experience);
-    $stmt_experience->bind_param("si", $description, $user_id);
+        
+        foreach ($skills as $skill) {
+            $sql_skill = "INSERT INTO skills (User_id, skill_name) VALUES (?, ?)";
+            $stmt_skill = $con->prepare($sql_skill);
+            $stmt_skill->bind_param("is", $user_id, $skill);
 
-    if (!$stmt_experience->execute()) {
-        echo json_encode(["error" => "Error updating description in experience"]);
-        exit();
+            if (!$stmt_skill->execute()) {
+                echo json_encode(["error" => "Error inserting skill data"]);
+                exit();
+            }
+        }
+    }
+
+    if ($description !== null) {
+        $sql_update_experience = "UPDATE experience SET description = ? WHERE User_id = ?";
+        $stmt_experience = $con->prepare($sql_update_experience);
+        $stmt_experience->bind_param("si", $description, $user_id);
+
+        if (!$stmt_experience->execute()) {
+            echo json_encode(["error" => "Error updating description in experience"]);
+            exit();
+        }
     }
 
     echo json_encode(["message" => "CV updated successfully.", "user_name" => $user_name, "phone" => $phone]);
