@@ -23,18 +23,44 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $token = str_replace("Bearer ", "", $token);
         $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
         
-        
         $user_id = $decoded->user_id;
 
-        $User_name = $_POST['User_name'] ?? null;
-        $Age = $_POST['Age'] ?? null;
-        $Phone = $_POST['Phone'] ?? null;
-        $Location = $_POST['Location'] ?? null;
-        $About = $_POST['About'] ?? null;
+        // قراءة الحقول المرسلة فقط
+        $fields = [];
+        $params = [];
+        
+        if (isset($_POST['User_name'])) {
+            $fields[] = "User_name = ?";
+            $params[] = $_POST['User_name'];
+        }
+        if (isset($_POST['Age'])) {
+            $fields[] = "Age = ?";
+            $params[] = $_POST['Age'];
+        }
+        if (isset($_POST['Phone'])) {
+            $fields[] = "Phone = ?";
+            $params[] = $_POST['Phone'];
+        }
+        if (isset($_POST['Location'])) {
+            $fields[] = "Location = ?";
+            $params[] = $_POST['Location'];
+        }
+        if (isset($_POST['About'])) {
+            $fields[] = "About = ?";
+            $params[] = $_POST['About'];
+        }
 
-        $sql = "UPDATE users SET User_name = ?, Age = ?, Phone = ?, Location = ?, About = ? WHERE User_id = ?";
+        if (empty($fields)) {
+            echo json_encode(["error" => "No fields to update."]);
+            exit();
+        }
+
+        // بناء استعلام التحديث ديناميكيًا
+        $sql = "UPDATE users SET " . implode(", ", $fields) . " WHERE User_id = ?";
+        $params[] = $user_id;
+        
         $stmt = $con->prepare($sql);
-        $stmt->bind_param("sssssi", $User_name, $Age, $Phone, $Location, $About, $user_id);
+        $stmt->bind_param(str_repeat("s", count($fields)) . "i", ...$params);
 
         if ($stmt->execute()) {
             echo json_encode(["message" => "Profile updated successfully."]);
@@ -53,4 +79,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 } else {
     echo json_encode(["error" => "Method not allowed"]);
 }
-?>
