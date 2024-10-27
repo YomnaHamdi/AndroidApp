@@ -37,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     $company_data = $result_company->fetch_assoc();
 
-    $sql_posts = "SELECT job_title, job_description, job_type, salary, created_at FROM job_posts WHERE Company_id = ?";
+    
+    $sql_posts = "SELECT job_id, job_title, job_description, job_type, salary, created_at FROM job_posts WHERE Company_id = ?";
     $stmt_posts = $con->prepare($sql_posts);
     $stmt_posts->bind_param("i", $company_id);
     $stmt_posts->execute();
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     $posts = [];
     while ($post = $result_posts->fetch_assoc()) {
-        $posts[] = $post;
+        $posts[] = $post; 
     }
 
     echo json_encode([
