@@ -2,11 +2,11 @@
 require 'vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-include 'db_connection.php'; 
+include 'db_connection.php';
 
 $secretKey = "9%fG8@h7!wQ4\$zR2*vX3&bJ1#nL6!mP5";
 
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
     $headers = getallheaders();
     $token = $headers['Authorization'] ?? null;
 
@@ -17,46 +17,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 
     try {
         $token = str_replace("Bearer ", "", $token);
-        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));  
-        $company_id = $decoded->Company_id;  
+        $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+        $company_id = $decoded->Company_id;
     } catch (Exception $e) {
         echo json_encode(["error" => "Invalid token: " . $e->getMessage()]);
         exit();
     }
 
+    $data = json_decode(file_get_contents("php://input"));
+    $job_id = $data->job_id ?? null;
 
-    $sql_company = "SELECT Company_name, Industry FROM companies WHERE Company_id = ?";
-    $stmt_company = $con->prepare($sql_company);
-    $stmt_company->bind_param("i", $company_id);
-    $stmt_company->execute();
-    $result_company = $stmt_company->get_result();
-
-    if ($result_company->num_rows === 0) {
-        echo json_encode(["error" => "Company not found."]);
+    if (!$job_id) {
+        echo json_encode(["error" => "Job ID is required."]);
         exit();
     }
 
-    $company_data = $result_company->fetch_assoc();
+    $sql = "DELETE FROM job_posts WHERE job_id = ? AND Company_id = ?";
+    $stmt = $con->prepare($sql);
+    $stmt->bind_param("ii", $job_id, $company_id);
 
-   
-    $sql_posts = "SELECT job_id, job_title, job_description, job_type, salary, created_at FROM job_posts WHERE Company_id = ?";
-    $stmt_posts = $con->prepare($sql_posts);
-    $stmt_posts->bind_param("i", $company_id);
-    $stmt_posts->execute();
-    $result_posts = $stmt_posts->get_result();
-
-    $posts = [];
-    while ($post = $result_posts->fetch_assoc()) {
-        $posts[] = $post; 
+    if ($stmt->execute()) {
+        echo json_encode(["message" => "Job post deleted successfully."]);
+    } else {
+        echo json_encode(["error" => "Error deleting job post."]);
     }
-
-   
-    echo json_encode([
-        "company_name" => $company_data['Company_name'],
-        "industry" => $company_data['Industry'],
-        "posts" => $posts
-    ]);
-
 } else {
     echo json_encode(["error" => "Method not allowed"]);
 }
