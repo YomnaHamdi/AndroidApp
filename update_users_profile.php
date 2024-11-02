@@ -3,7 +3,7 @@ require 'vendor/autoload.php';
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
-
+include 'auth_middleware.php';
 include 'db_connection.php'; 
 
 $secretKey = "9%fG8@h7!wQ4\$zR2*vX3&bJ1#nL6!mP5"; 
