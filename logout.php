@@ -28,5 +28,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     echo json_encode(["error" => "Method not allowed"]);
 }
 
-$conn->close();
+$con->close();
 exit;
