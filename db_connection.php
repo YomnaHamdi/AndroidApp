@@ -26,7 +26,6 @@ if ($con->connect_error) {
     die("فشل الاتصال بقاعدة البيانات: " . $con->connect_error);
 }
 
-define('JWT_SECRET_KEY', '9%fG8@h7!wQ4\$zR2*vX3&bJ1#nL6!mP5');
 
 
 if (!defined('JWT_SECRET_KEY')) {
