@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sql_notification = "INSERT INTO job_notifications (Application_id, Notification_content, Is_read, Sent_at, job_id, User_id) 
                                  VALUES (?, ?, 0, NOW(), ?, ?)";
             $stmt_notification = $con->prepare($sql_notification);
-            $stmt_notification->bind_param("isiiii", $applicationId, $notificationContent, $isRead, $sentAt, $jobId, $userId);
+            $stmt_notification->bind_param("issi", $applicationId, $notificationContent,  $jobId, $userId);
 
             if ($stmt_notification->execute()) {
                 echo json_encode(["message" => "Application submitted and notification created successfully."]);
