@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $sentAt = date('Y-m-d H:i:s');
 
             $sql_notification = "INSERT INTO job_notifications (Application_id, Notification_content, Is_read, Sent_at, job_id, User_id) 
-                                 VALUES (?, ?, ?, ?, ?, ?)";
+                                 VALUES (?, ?, 0, NOW(), ?, ?)";
             $stmt_notification = $con->prepare($sql_notification);
             $stmt_notification->bind_param("isiiii", $applicationId, $notificationContent, $isRead, $sentAt, $jobId, $userId);
 
