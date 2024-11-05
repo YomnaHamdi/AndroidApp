@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         $sql = "SELECT j.job_title, u.User_id as User_id, u.User_name, n.Sent_at 
                 FROM job_notifications n
                 JOIN users u ON n.User_id = u.id
-                JOIN job_posts j ON n.job_id = j.id
+                JOIN job_posts j ON n.job_id = j.job_id
                 WHERE j.Company_id = ?
                 ORDER BY j.job_title, n.Sent_at DESC";
         $stmt = $con->prepare($sql);
