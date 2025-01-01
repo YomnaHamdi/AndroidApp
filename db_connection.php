@@ -29,7 +29,7 @@ if ($con->connect_error) {
 
 
 if (!defined('JWT_SECRET_KEY')) {
-    define('JWT_SECRET_KEY', '9%fG8@h7!wQ4$zR2*vX3&bJ1#nL6!mP5'); 
+    define('JWT_SECRET_KEY', '9%fG8@h7!wQ4\$zR2*vX3&bJ1#nL6!mP5'); 
 }
 
 //echo "تم الاتصال بقاعدة البيانات بنجاح";
